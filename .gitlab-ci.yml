@@ -1,0 +1,5 @@
+# Do NOT change the contents of this file. They will be overwritten, and will likely break your builds. You may also lose marks.
+
+include:
+  - project: 'Computer-Science/docker-prebuild/rw314-ci'
+    file: 'student-ci.yml'
