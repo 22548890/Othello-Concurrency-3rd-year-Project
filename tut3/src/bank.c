@@ -26,6 +26,7 @@ void deposit(int acc_num, double amount);
 void withdrawal(int acc_num, double amount);
 void transfer(int acc_from, int acc_to, double amount);
 void acc_balance(int acc_num);
+int nt =1;
 
 #define MAX_ACCS 10
 
@@ -101,9 +102,10 @@ int main(int argc, char *argv[])
         get_fname_from_args(argc,argv,0));
         exit(0);
     }
-
-    /* Execute batch of transactions */
+    nt = strtol(argv[1], NULL, 10);
+      /* Execute batch of transactions */
     while (transaction_list != NULL) {
+        #pragma omp parallel num_threads(nt) 
         if (transaction_list->type == DP_T){
             deposit(transaction_list->dest, transaction_list->amount);
         } else if (transaction_list->type == WD_T){
@@ -113,7 +115,9 @@ int main(int argc, char *argv[])
         } else if (transaction_list->type == BL_T){
             acc_balance(transaction_list->src);
         }
-        transaction_list = transaction_list->next;
+        
+            transaction_list = transaction_list->next;
+
     }
 
     printf("    *********************************************************   \n");
@@ -134,6 +138,7 @@ int main(int argc, char *argv[])
 void deposit(int acc_num, double amount)
 {
     /* Valid account */
+    #pragma omp critical
     if (acc_num < num_accounts) { 
         log_dp(amount, acc_num, account_balances[acc_num]); 
         account_balances[acc_num] += amount;
@@ -152,6 +157,7 @@ void deposit(int acc_num, double amount)
 void withdrawal(int acc_num, double amount)
 {
     /* Valid account */
+    #pragma omp critical
     if (acc_num < num_accounts) {
 
       /* Amount available in from account */
@@ -177,6 +183,7 @@ void withdrawal(int acc_num, double amount)
  */
 void transfer(int acc_from, int acc_to, double amount) {
     /* Accounts valid */
+    #pragma omp critical
     if ((acc_from < num_accounts) && (acc_to < num_accounts)) {  
 
       /* Amount available in from account */
@@ -201,6 +208,7 @@ void transfer(int acc_from, int acc_to, double amount) {
 void acc_balance(int acc_num)
 {
     /* Valid account */
+    #pragma omp critical
     if (acc_num < num_accounts) {
         log_bl(acc_num, account_balances[acc_num]); 
     } else {
