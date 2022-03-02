@@ -1,0 +1,12 @@
+deposit 3 400 
+withdrawal 2 200 
+deposit 3 100 
+withdrawal 1 150 
+withdrawal 3 1150 
+withdrawal 15 300 
+deposit 3 300 
+deposit 15 300 
+transfer 3 0 300
+transfer 15 1 300 
+balance 3 
+balance 15 
