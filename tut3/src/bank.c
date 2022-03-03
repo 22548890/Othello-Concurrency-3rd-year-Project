@@ -80,6 +80,7 @@ char* get_fname_from_args(int argc, char* argv[], int id) {
 /*------------------------------------------------------------------*/
 int main(int argc, char *argv[])
 {
+    int my_rank=1;
     int num_files = get_num_files_from_args(argc, argv);
 
     /* Declare and initialise accounts */
@@ -93,32 +94,40 @@ int main(int argc, char *argv[])
     if (num_files == 1) {
         printf("\033[22;32m Warning: Only one thread reading one transaction file supported.\033[0m\n");
     }
-     
+    #pragma omp parallel num_threads(num_files)
+        { 
     /* Parse file and load batch of transactions into transaction_list */ 
     struct transaction_t* transaction_list;
-    transaction_list = parse_transaction_file(get_fname_from_args(argc,argv,0));
+    my_rank = omp_get_thread_num();
+    transaction_list = parse_transaction_file(get_fname_from_args(argc,argv, my_rank));
     if (transaction_list == NULL) { 
         printf("Something bad happened, parse_transaction_file(%s) returned no list\n", \
-        get_fname_from_args(argc,argv,0));
+        get_fname_from_args(argc,argv, my_rank));
         exit(0);
     }
-    nt = strtol(argv[1], NULL, 10);
+    
       /* Execute batch of transactions */
+     
     while (transaction_list != NULL) {
-        #pragma omp parallel num_threads(nt) 
+        
         if (transaction_list->type == DP_T){
             deposit(transaction_list->dest, transaction_list->amount);
-        } else if (transaction_list->type == WD_T){
-            withdrawal(transaction_list->src, transaction_list->amount);
-        } else if (transaction_list->type == TR_T){
-            transfer(transaction_list->src, transaction_list->dest, transaction_list->amount);
         } else if (transaction_list->type == BL_T){
             acc_balance(transaction_list->src);
+        }
+        #pragma omp critical
+        {
+        if (transaction_list->type == TR_T){
+            transfer(transaction_list->src, transaction_list->dest, transaction_list->amount);
+        } else if (transaction_list->type == WD_T){
+            withdrawal(transaction_list->src, transaction_list->amount);
+        }
         }
         
             transaction_list = transaction_list->next;
 
     }
+      }
 
     printf("    *********************************************************   \n");
     for (int i = 0; i < num_accounts; i++) {
@@ -138,7 +147,6 @@ int main(int argc, char *argv[])
 void deposit(int acc_num, double amount)
 {
     /* Valid account */
-    #pragma omp critical
     if (acc_num < num_accounts) { 
         log_dp(amount, acc_num, account_balances[acc_num]); 
         account_balances[acc_num] += amount;
@@ -157,7 +165,6 @@ void deposit(int acc_num, double amount)
 void withdrawal(int acc_num, double amount)
 {
     /* Valid account */
-    #pragma omp critical
     if (acc_num < num_accounts) {
 
       /* Amount available in from account */
@@ -183,7 +190,6 @@ void withdrawal(int acc_num, double amount)
  */
 void transfer(int acc_from, int acc_to, double amount) {
     /* Accounts valid */
-    #pragma omp critical
     if ((acc_from < num_accounts) && (acc_to < num_accounts)) {  
 
       /* Amount available in from account */
@@ -208,7 +214,6 @@ void transfer(int acc_from, int acc_to, double amount) {
 void acc_balance(int acc_num)
 {
     /* Valid account */
-    #pragma omp critical
     if (acc_num < num_accounts) {
         log_bl(acc_num, account_balances[acc_num]); 
     } else {
