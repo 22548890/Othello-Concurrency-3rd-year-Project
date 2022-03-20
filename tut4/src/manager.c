@@ -61,7 +61,6 @@ void schedule_processes(struct pcb_t *ready_pcbs, struct resource_t *resource_li
     struct pcb_t *this_pcb;
     this_pcb = ready_queue;
     struct pcb_t *pcb_in_priority;
-    
 
     do
     {
@@ -79,9 +78,10 @@ void schedule_processes(struct pcb_t *ready_pcbs, struct resource_t *resource_li
         { //execute the pcb in priority & check if waiting
             execute_instruction(pcb_in_priority, pcb_in_priority->next_instruction);
             if (pcb_in_priority->state == WAITING)
-            {continue;//if waiting process next}
-                
-            
+            {
+                continue;
+            } //if waiting process next
+
         } while (pcb_in_priority->next_instruction != NULL);
         if (pcb_in_priority->next_instruction == NULL)
         {
@@ -93,14 +93,14 @@ void schedule_processes(struct pcb_t *ready_pcbs, struct resource_t *resource_li
 
     //printf("TODO: Implement two schedulers: a Priority based scheduler and a Round Robin (RR) scheduler \n");
 }
-
 /**
  * @brief Interpret a instruction and calls the respective functions
  *
  * @param pcb The current process for which the instruction must me executed.
  * @param instruction The instruction which must be executed.
  */
-void execute_instruction(struct pcb_t *pcb, struct instruction_t *instruction) {
+void execute_instruction(struct pcb_t *pcb, struct instruction_t *instruction)
+{
 
     switch (instruction->type)
     {
@@ -142,6 +142,8 @@ void process_request(struct pcb_t *pcb, struct instruction_t *instruction)
     if (available)
     {
         log_request_acquired(pcb->page->name, resource_name);
+        //print "P1 req R1: acquired; Available: R1 R2 R3 R3 R3"
+        printf("%s req %s: acquired; ", pcb->page->name, resource_name);
         print_available_resources();
         pcb->next_instruction = instruction->next;
         pcb->state = RUNNING;
@@ -150,6 +152,8 @@ void process_request(struct pcb_t *pcb, struct instruction_t *instruction)
     {
         pcb->state = WAITING;
         log_request_waiting(pcb->page->name, resource_name);
+        //print "P1 req R2: waiting;"
+        printf("%s req %s: waiting;\n", pcb->page->name, resource_name);
     }
 }
 
@@ -193,8 +197,44 @@ int acquire_resource(struct pcb_t *pcb, char *resource_name)
 {
     //printf("TODO: implement a function that can assign resource_name to pcb if the resource is available and
     //mark it as unavailable in the resources list\n");
+    struct resource_t *Rnew;
+    struct resource_t *this_pcb;
+    this_pcb = global_resource_list;
+    int available = 0;
+    while (this_pcb != NULL)
+    { //compare name&resource given
+        if (strcmp(this_pcb->name, resource_name) == 0
+         && this_pcb->available)
+        {
+            available = 1;
+            break;
+        }
+        this_pcb = this_pcb->next;
+    }
+    if (available == 1)
+    { //realloc resouce_new
+        Rnew = malloc(sizeof(struct resource_t));
+        Rnew->name = this_pcb->name;
+        Rnew->next = NULL;
 
-    return 0;
+        if (pcb->resources == NULL)
+        {
+            pcb->resources = Rnew;
+        }
+        else
+        {
+            Rnew->next = pcb->resources;
+            pcb->resources = Rnew;
+        }
+        this_pcb->available = 0;
+        return 1;
+    }
+    else
+    {
+        //process waiting
+        process_to_waitingq(pcb);
+        return 0;
+    }
 }
 
 /**
@@ -314,4 +354,3 @@ void dealloc_queues()
     dealloc_pcb_list(*waiting_queue);
     dealloc_pcb_list(*terminated_queue);
 }
-
