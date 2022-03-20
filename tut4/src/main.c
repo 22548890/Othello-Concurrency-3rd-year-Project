@@ -64,6 +64,8 @@ int main(int argc, char** argv) {
     schedule_processes(ready_pcbs, resource_list, sched_algo, time_quantum);
     
     dealloc_data_structures();
+
+    get_available_resources();
     
     return EXIT_SUCCESS;
 }

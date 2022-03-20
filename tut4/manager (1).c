@@ -14,7 +14,7 @@
 
 void process_request(struct pcb_t *pcb, struct instruction_t *instruction);
 void process_release(struct pcb_t *pcb, struct instruction_t *instruction);
-int acquire_resource(struct pcb_t *pcb, char *resource);
+int acquire_resource(struct pcb_t *pcb ,char* resource);
 
 void print_available_resources();
 void process_to_readyq(struct pcb_t *proc);
@@ -23,11 +23,11 @@ void process_to_terminatedq(struct pcb_t *proc);
 
 void execute_instruction(struct pcb_t *pcb, struct instruction_t *instruction);
 
-struct pcb_t *detect_deadlock();
-void resolve_deadlock(struct pcb_t *pcb);
+struct pcb_t* detect_deadlock();
+void resolve_deadlock (struct pcb_t *pcb);
 
 void print_process_resources(struct pcb_t *pcb);
-void print_q(struct pcb_t *pcb);
+void print_q (struct pcb_t *pcb);
 
 /**
  * The following structs are the queues as required by the project spec together
@@ -36,9 +36,9 @@ void print_q(struct pcb_t *pcb);
  */
 struct pcb_t *ready_queue = NULL;
 struct pcb_t *waiting_queue = NULL;
+struct pcb_t *start_wq = NULL;
 struct pcb_t *terminated_queue = NULL;
-
-struct resource_t *global_resource_list = NULL;
+struct resource_t *resource_l = NULL;
 
 /**
  * @brief Schedules each instruction of each process in a round-robin fashion.
@@ -51,47 +51,44 @@ struct resource_t *global_resource_list = NULL;
  * @param algorithm The type of algorithm to be used (0: Priority, 1: RR).
  * @param time_q The time quantum for the RR algorithm.
  */
-void schedule_processes(struct pcb_t *ready_pcbs, struct resource_t *resource_list, int sched_algo, int time_quantum)
-{
+void schedule_processes(struct pcb_t *ready_pcbs, struct resource_t *resource_list, 
+        int sched_algo, int time_quantum) {
 
     //TODO: Add ready_pcbs to the ready_queue
-    //      Add resource_list to a globally declared resource list
+    //      Add resource_list to a globally declared resource list 
     ready_queue = ready_pcbs;
-    global_resource_list = resource_list;
-    struct pcb_t *this_pcb;
-    this_pcb = ready_queue;
-    struct pcb_t *pcb_in_priority;
+    resource_l = resource_list;
+    
+    
+    printf("TODO: Implement two schedulers: a Priority based scheduler and a Round Robin (RR) scheduler \n");
+
+
+    struct pcb_t *highest_p = ready_queue;
+    struct pcb_t *start_rq = ready_queue;
     
 
-    do
-    {
-        this_pcb = ready_queue;
-        pcb_in_priority = ready_queue;
-        do
-        { //find priority list in order
-            if (this_pcb->priority < pcb_in_priority->priority)
-            {
-                pcb_in_priority = this_pcb;
-            }
-            this_pcb = this_pcb->next;
-        } while (this_pcb != NULL);
-        do
-        { //execute the pcb in priority & check if waiting
-            execute_instruction(pcb_in_priority, pcb_in_priority->next_instruction);
-            if (pcb_in_priority->state == WAITING)
-            {continue;//if waiting process next}
-                
-            
-        } while (pcb_in_priority->next_instruction != NULL);
-        if (pcb_in_priority->next_instruction == NULL)
-        {
-            //terminate pcb from queue
-            pcb_in_priority->state = TERMINATED;
-            process_to_terminatedq(pcb_in_priority);
-        }
-    } while (ready_queue != NULL);
+    while(ready_queue->next != NULL) {
+        if (highest_p->priority > ready_queue->next->priority) {
+            highest_p = ready_queue->next;
+        };
+        ready_queue = ready_queue->next;
+    };
+    
+    // process_release(highest_p, highest_p->next_instruction);
+    process_to_waitingq(highest_p);
+    printf("waiting list:%d \n", waiting_queue->priority);
 
-    //printf("TODO: Implement two schedulers: a Priority based scheduler and a Round Robin (RR) scheduler \n");
+    process_to_waitingq(ready_queue);
+    printf("waiting listsss:%d \n", waiting_queue->priority);
+ 
+    process_to_waitingq(start_rq);
+    
+    printf("waiting list:%d \n",waiting_queue->priority);
+    
+
+    // printf("rrr: %s", highest_p->next_instruction->resource);
+
+
 }
 
 /**
@@ -102,20 +99,20 @@ void schedule_processes(struct pcb_t *ready_pcbs, struct resource_t *resource_li
  */
 void execute_instruction(struct pcb_t *pcb, struct instruction_t *instruction) {
 
-    switch (instruction->type)
-    {
+    switch (instruction->type) {
 
-    case REQ_V:
-        process_request(pcb, instruction);
-        break;
+        case REQ_V: 
+            process_request(pcb, instruction);
+            break;
+        
+        case REL_V: 
+            process_release(pcb, instruction);
+            break;
 
-    case REL_V:
-        process_release(pcb, instruction);
-        break;
-
-    default:
-        break;
+        default:
+            break;
     }
+
 }
 
 /**
@@ -129,27 +126,23 @@ void execute_instruction(struct pcb_t *pcb, struct instruction_t *instruction) {
  * @param current The current process for which the resource must be acquired.
  * @param instruct The instruction which requests the resource.
  */
-void process_request(struct pcb_t *pcb, struct instruction_t *instruction)
-{
+void process_request(struct pcb_t *pcb, struct instruction_t *instruction) {
 
-    char *resource_name;
+    char* resource_name;
     int available;
 
     resource_name = instruction->resource;
-
+    
     available = acquire_resource(pcb, resource_name);
 
-    if (available)
-    {
-        log_request_acquired(pcb->page->name, resource_name);
+    if (available) {
+        log_request_acquired(pcb->page->name, resource_name);    
         print_available_resources();
         pcb->next_instruction = instruction->next;
         pcb->state = RUNNING;
-    }
-    else
-    {
+    } else {
         pcb->state = WAITING;
-        log_request_waiting(pcb->page->name, resource_name);
+        log_request_waiting(pcb->page->name, resource_name);    
     }
 }
 
@@ -163,14 +156,25 @@ void process_request(struct pcb_t *pcb, struct instruction_t *instruction)
  * @param current The process which releases the resource.
  * @param instruct The instruction to release the resource.
  */
-void process_release(struct pcb_t *pcb, struct instruction_t *instruction)
-{
-    printf("TODO: Implement a function that can release a resource and mark it available in the resources list");
+void process_release(struct pcb_t *pcb, struct instruction_t *instruction) {
+    printf("TODO: Implement a function that can release a resource and mark it available in the resources list\n");
     printf("if successful call log_release_released, else call log_release_error \n");
-    // successful release
-    log_release_released(pcb->page->name, instruction->resource);
-    // resource not assigned to process
-    log_release_error(pcb->page->name, instruction->resource);
+    while(resource_l != NULL) {
+        if (strcmp(instruction->resource, resource_l->name) == 0) {
+            resource_l->available = 1;
+        }
+        resource_l = resource_l->next;
+    }
+       
+   if (resource_l->available == 0) {
+        // resource not assigned to process 
+        log_release_error(pcb->page->name, instruction->resource);
+    } else {
+        // successful release
+         log_release_released(pcb->page->name, instruction->resource);
+    }
+    
+    
 }
 
 /**
@@ -189,11 +193,37 @@ void process_release(struct pcb_t *pcb, struct instruction_t *instruction)
  * @return 1 for TRUE if the resource is available. 0 for FALSE if the resource
  * is not available.
  */
-int acquire_resource(struct pcb_t *pcb, char *resource_name)
-{
-    //printf("TODO: implement a function that can assign resource_name to pcb if the resource is available and
-    //mark it as unavailable in the resources list\n");
+int acquire_resource(struct pcb_t *pcb, char* resource_name) {
+    printf("TODO: implement a function that can assign resource_name to pcb if the resource is available and mark it as unavailable in the resources list\n");
+    struct resource_t *temp = resource_l;
+    while(temp->name != resource_name) {
+        temp = temp->next;
+    };
 
+    if (temp->available) {
+        temp->available = 0;
+
+        struct resource_t *all_resource = NULL;
+        all_resource->name = temp->name;
+        all_resource->available = temp->available;
+        all_resource->next = NULL;
+
+        if (pcb->resources==NULL) {
+            pcb->resources = all_resource;
+        } else {
+            struct resource_t *r_temp = pcb->resources;
+            while(r_temp->next != NULL) {
+                r_temp = r_temp->next;
+            }
+            r_temp->next = all_resource;
+        }
+        return 1;
+
+
+    }
+
+
+    // printf("resource: %s", resource_l->name);
     return 0;
 }
 
@@ -202,10 +232,13 @@ int acquire_resource(struct pcb_t *pcb, char *resource_name)
  *
  * @param proc The process which must be set to ready.
  */
-void process_to_readyq(struct pcb_t *proc)
-{
+void process_to_readyq(struct pcb_t *proc) {
     printf("TODO: implement a function that can move proc from the waiting queue to the ready queue\n");
-
+        while (ready_queue != NULL){
+        ready_queue = ready_queue->next;
+    }
+    proc->next = NULL;        
+    ready_queue = proc;
     log_ready(proc->page->name, ready_queue);
 }
 
@@ -214,9 +247,14 @@ void process_to_readyq(struct pcb_t *proc)
  *
  * @param proc The process which must be set to waiting.
  */
-void process_to_waitingq(struct pcb_t *proc)
-{
+void process_to_waitingq(struct pcb_t *proc) {
     printf("TODO: implement a function that can move proc from the ready queue to the waiting queue\n");
+    
+    while (waiting_queue != NULL){
+        waiting_queue = waiting_queue->next;
+    }
+    proc->next = NULL;        
+    waiting_queue = proc;
     log_waiting(proc->page->name, waiting_queue);
 }
 
@@ -225,17 +263,22 @@ void process_to_waitingq(struct pcb_t *proc)
  *
  * @param proc The process which has terminated 
  */
-void process_to_terminatedq(struct pcb_t *proc)
-{
+void process_to_terminatedq(struct pcb_t *proc) {
     printf("TODO: implement a function that can move proc from the ready queue to the terminated queue\n");
+    
+    while (terminated_queue != NULL){
+        terminated_queue = terminated_queue->next;
+    }
+    proc->next = NULL;        
+    terminated_queue = proc;
+    
     log_terminated(proc->page->name);
 }
 
 /**
  * @brief Takes the waiting queue and detects deadlock
  */
-struct pcb_t *detect_deadlock()
-{
+struct pcb_t* detect_deadlock() {
     printf("detect_deadlock not implemented\n");
 
     // if deadlock detected
@@ -253,26 +296,22 @@ struct pcb_t *detect_deadlock()
  * @param pcb The process chosen to be reset and release all of its resources.
  *
  */
-void resolve_deadlock(struct pcb_t *pcb)
-{
+void resolve_deadlock (struct pcb_t *pcb) {
     printf("resolve_deadlock not implemented\n");
 }
 
 /**
  * @brief Prints the global list of available resources.
  */
-void print_available_resources()
-{
+void print_available_resources() {
 
     struct resource_t *current_resource;
     current_resource = get_available_resources();
 
     printf("Available:");
-    do
-    {
+    do {
 
-        if (current_resource->available)
-        {
+        if (current_resource->available) {
             printf(" %s", current_resource->name);
         }
         current_resource = current_resource->next;
@@ -283,35 +322,30 @@ void print_available_resources()
 }
 
 #ifdef DEBUG
-void print_process_resources(struct pcb_t *pcb)
-{
+void print_process_resources(struct pcb_t *pcb) {
     struct resource_t *resource;
     resource = pcb->resources;
 
-    printf("Resources for pcb %s: ", pcb->page->name);
-    while (resource != NULL)
-    {
+    printf("Resources for pcb %s: ",pcb->page->name);
+    while (resource != NULL) {
         printf("%s->", resource->name);
-        resource = resource->next;
+        resource = resource->assigned_to;
     }
     printf("\n");
 }
 
-void print_q(struct pcb_t *pcb)
-{
-    while (pcb != NULL)
-    {
+void print_q (struct pcb_t *pcb) {
+    while (pcb != NULL) {
         printf(" %s,", pcb->page->name);
-        pcb = pcb->next;
+        pcb = pcb->q_next;
     }
     printf("\n");
 }
 #endif
 
 void dealloc_queues()
-{
+{       
     dealloc_pcb_list(*ready_queue);
     dealloc_pcb_list(*waiting_queue);
     dealloc_pcb_list(*terminated_queue);
 }
-
