@@ -29,14 +29,14 @@ int main(void) {
 		/* Create greeting message for process my_rank */
 		sprintf(greeting, "Greetings from process %d of %d!", my_rank, comm_sz);
 		/* TODO: Uncomment this line once parallelised - do not change it */
-		//log_msg(greeting); 
+		log_msg(greeting); 
 		MPI_Send(greeting, strlen(greeting)+1, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
 		/* TODO: Send message to process 0 */
 
 	} else {
 		sprintf(greeting, "Greetings from process %d of %d!", my_rank, comm_sz);
 		/* TODO: Uncomment these lines once parallelised - do not change it */
-		//log_msg(greeting); 
+		log_msg(greeting); 
 		printf("%s\n", greeting);
 
 		/* TODO: Receive a message from each of the other processes and print it*/
