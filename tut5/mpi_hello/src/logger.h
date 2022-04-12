@@ -10,6 +10,6 @@
 
 /* Functions */
 void log_msg(char *msg);
-void log_recv(int rank);
+void log_recv();
 
 #endif

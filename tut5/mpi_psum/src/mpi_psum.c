@@ -73,11 +73,19 @@ int process_zero(char *input_file) {
 	int *vector_local = NULL;
 	int size_full = 0, size_local = 0; 
 	int global_max = 0;
+	int comm_sz;
 
 	/* TODO: get comm_sz: e.g., 2 */ 
+	MPI_Init(NULL,NULL);
+	MPI_Comm_size(MPI_COMM_WORLD, &comm_sz);
 	/* TODO: allocate memory */
+	vector_full = malloc(sizeof(int)*strlen(input_file));
 	/* TODO: read values from input file and store in vector_full: e.g., 1 2 3 4 5 6 7 8 9 */
 	/* TODO: store the number of values read in size_full: e.g., 9 */
+	FILE *myFile;
+	myFile = fopen(input_file, "r");
+	fscanf(myFile, "%d ", vector_full);
+	
 
 	#ifdef DEBUG 
 	print_vector(vector_full, size_full, "Full vector on proc");

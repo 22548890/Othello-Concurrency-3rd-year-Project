@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h> 
 #include <mpi.h>   
+
 #include "logger.h"
 
 #define MAX 100
