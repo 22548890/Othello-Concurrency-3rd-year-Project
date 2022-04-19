@@ -102,6 +102,13 @@ void add_col_vals(int** A, int m, int n, int* x) {
  * Out: x
  */
 void add_col_vals_efficiently(int** A, int m, int n, int* x) {
+	int i=0, j=0; //by swapping for loops, it becomes row-major, which is much more efficient in cache
+	for(i = 0; i < m; i++) {
+		x[j] = 0;
+		for(j = 0; j < n; j++) {
+			x[j] += A[i][j];
+		}
+	}
 }
 
 /**
