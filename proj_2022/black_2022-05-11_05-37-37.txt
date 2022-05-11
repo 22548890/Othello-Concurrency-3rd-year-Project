@@ -1,0 +1,859 @@
+Initialise communication and get player colour 
+score=157 at 34
+score=166 at 43
+score=166 at 56
+score=157 at 65
+bestie score=166 at 43
+   1 2 3 4 5 6 7 8 [b=4 w=1]
+1  . . . . . . . . 
+2  . . . . . . . . 
+3  . . . . . . . . 
+4  . . b b b . . . 
+5  . . . b w . . . 
+6  . . . . . . . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=3 w=3]
+1  . . . . . . . . 
+2  . . . . . . . . 
+3  . . . . w . . . 
+4  . . b b w . . . 
+5  . . . b w . . . 
+6  . . . . . . . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+score=103 at 36
+score=148 at 66
+score=174 at 56
+score=54 at 46
+score=115 at 26
+bestie score=174 at 56
+   1 2 3 4 5 6 7 8 [b=5 w=2]
+1  . . . . . . . . 
+2  . . . . . . . . 
+3  . . . . w . . . 
+4  . . b b w . . . 
+5  . . . b b b . . 
+6  . . . . . . . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=3 w=5]
+1  . . . . . . . . 
+2  . . . . . . . . 
+3  . . . . w . . . 
+4  . w w w w . . . 
+5  . . . b b b . . 
+6  . . . . . . . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+score=177 at 33
+score=145 at 36
+score=132 at 34
+score=120 at 32
+score=109 at 25
+bestie score=177 at 33
+   1 2 3 4 5 6 7 8 [b=5 w=4]
+1  . . . . . . . . 
+2  . . . . . . . . 
+3  . . b . w . . . 
+4  . w w b w . . . 
+5  . . . b b b . . 
+6  . . . . . . . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=4 w=6]
+1  . . . . . . . . 
+2  . . . . . . . . 
+3  . . b . w . . . 
+4  . w w b w . . . 
+5  . . . w b b . . 
+6  . . w . . . . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+score=102 at 41
+score=75 at 51
+score=105 at 46
+score=113 at 34
+score=200 at 53
+score=144 at 64
+score=72 at 25
+score=84 at 26
+bestie score=200 at 53
+   1 2 3 4 5 6 7 8 [b=7 w=4]
+1  . . . . . . . . 
+2  . . . . . . . . 
+3  . . b . w . . . 
+4  . w b b w . . . 
+5  . . b b b b . . 
+6  . . w . . . . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=4 w=8]
+1  . . . . . . . . 
+2  . . w . . . . . 
+3  . . w . w . . . 
+4  . w w b w . . . 
+5  . . w b b b . . 
+6  . . w . . . . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+score=277 at 41
+score=176 at 36
+score=188 at 34
+score=186 at 46
+score=136 at 26
+score=172 at 32
+score=123 at 25
+score=120 at 52
+score=142 at 62
+score=193 at 22
+score=89 at 72
+bestie score=277 at 41
+   1 2 3 4 5 6 7 8 [b=7 w=6]
+1  . . . . . . . . 
+2  . . w . . . . . 
+3  . . w . w . . . 
+4  b b b b w . . . 
+5  . . w b b b . . 
+6  . . w . . . . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=5 w=9]
+1  . . . . . . . . 
+2  . . w . . . . . 
+3  . . w . w . . . 
+4  b b b w w . . . 
+5  . . w b w b . . 
+6  . . w . . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+score=193 at 13
+score=218 at 36
+score=268 at 34
+score=209 at 46
+score=154 at 64
+score=156 at 52
+score=206 at 24
+score=136 at 73
+score=182 at 76
+score=185 at 72
+bestie score=268 at 34
+   1 2 3 4 5 6 7 8 [b=8 w=7]
+1  . . . . . . . . 
+2  . . w . . . . . 
+3  . . w b w . . . 
+4  b b b b b . . . 
+5  . . w b w b . . 
+6  . . w . . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=7 w=9]
+1  . . . . . . . . 
+2  . . w . . . . . 
+3  w . w b w . . . 
+4  b w b b b . . . 
+5  . . w b w b . . 
+6  . . w . . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+score=53 at 13
+score=53 at 36
+score=69 at 65
+score=67 at 32
+score=34 at 25
+score=60 at 52
+score=37 at 62
+score=25 at 26
+score=35 at 73
+score=69 at 76
+score=298 at 21
+score=0 at 12
+score=57 at 22
+score=-8 at 72
+score=0 at 77
+bestie score=298 at 21
+   1 2 3 4 5 6 7 8 [b=9 w=8]
+1  . . . . . . . . 
+2  b . w . . . . . 
+3  b . w b w . . . 
+4  b w b b b . . . 
+5  . . w b w b . . 
+6  . . w . . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=5 w=13]
+1  . . . . . . . . 
+2  b . w . . . . . 
+3  b . w b w . . . 
+4  b w w w w w . . 
+5  . . w b w w . . 
+6  . . w . . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+score=252 at 36
+score=243 at 64
+score=187 at 47
+score=282 at 52
+score=208 at 57
+score=355 at 32
+score=211 at 67
+score=258 at 12
+score=228 at 72
+bestie score=355 at 32
+   1 2 3 4 5 6 7 8 [b=8 w=11]
+1  . . . . . . . . 
+2  b . w . . . . . 
+3  b b b b w . . . 
+4  b w b w w w . . 
+5  . . w b w w . . 
+6  . . w . . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=6 w=14]
+1  . . . . . . . . 
+2  b . w w . . . . 
+3  b b w w w . . . 
+4  b w b w w w . . 
+5  . . w b w w . . 
+6  . . w . . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+score=324 at 13
+score=363 at 14
+score=339 at 36
+score=221 at 64
+score=231 at 47
+score=296 at 52
+score=195 at 57
+score=315 at 25
+score=255 at 73
+score=260 at 72
+bestie score=363 at 14
+   1 2 3 4 5 6 7 8 [b=11 w=10]
+1  . . . b . . . . 
+2  b . b b . . . . 
+3  b b w b w . . . 
+4  b w b b w w . . 
+5  . . w b w w . . 
+6  . . w . . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=9 w=13]
+1  . . w b . . . . 
+2  b . w w . . . . 
+3  b b w b w . . . 
+4  b w b b w w . . 
+5  . . w b w w . . 
+6  . . w . . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+score=81 at 36
+score=-58 at 64
+score=-109 at 47
+score=-24 at 52
+score=-348 at 57
+score=-251 at 62
+score=-715 at 26
+score=-223 at 67
+score=-769 at 73
+score=5480 at 12
+score=-1217 at 72
+score=-2352 at 22
+score=-580 at 77
+bestie score=5480 at 12
+   1 2 3 4 5 6 7 8 [b=12 w=11]
+1  . b b b . . . . 
+2  b . b w . . . . 
+3  b b w b w . . . 
+4  b w b b w w . . 
+5  . . w b w w . . 
+6  . . w . . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=9 w=15]
+1  . b b b . . . . 
+2  b . b w . . . . 
+3  b b w w w . . . 
+4  b w b w w w . . 
+5  . . w w w w . . 
+6  . . w w . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+score=4812 at 36
+score=4823 at 65
+score=2681 at 47
+score=5289 at 52
+score=2891 at 57
+score=5175 at 25
+score=2575 at 67
+score=2477 at 73
+score=3279 at 74
+score=2553 at 75
+bestie score=5289 at 52
+   1 2 3 4 5 6 7 8 [b=11 w=14]
+1  . b b b . . . . 
+2  b . b w . . . . 
+3  b b w w w . . . 
+4  b b b w w w . . 
+5  . b w w w w . . 
+6  . . w w . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=9 w=17]
+1  . b b b . . . . 
+2  b . b w . . . . 
+3  b b w w w . . . 
+4  b w b w w w . . 
+5  w w w w w w . . 
+6  . . w w . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+score=6588 at 61
+score=-2522 at 36
+score=-2702 at 65
+score=-2867 at 57
+score=-3228 at 25
+score=-2686 at 62
+score=-2529 at 47
+score=-2713 at 67
+score=-2662 at 73
+score=-2860 at 74
+score=-2771 at 75
+bestie score=6588 at 61
+   1 2 3 4 5 6 7 8 [b=12 w=15]
+1  . b b b . . . . 
+2  b . b w . . . . 
+3  b b w w w . . . 
+4  b w b w w w . . 
+5  b b w w w w . . 
+6  b . w w . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=11 w=17]
+1  . b b b . . . . 
+2  b . b w . . . . 
+3  b b w w w . . . 
+4  b w b w w w . . 
+5  b w w w w w . . 
+6  b w w w . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+score=9122 at 15
+score=5324 at 36
+score=5817 at 65
+score=3882 at 47
+score=3829 at 57
+score=3661 at 25
+score=3937 at 67
+score=3994 at 73
+score=4448 at 74
+score=4633 at 75
+score=3613 at 72
+bestie score=9122 at 15
+   1 2 3 4 5 6 7 8 [b=15 w=14]
+1  . b b b b . . . 
+2  b . b b . . . . 
+3  b b b w w . . . 
+4  b b b w w w . . 
+5  b w w w w w . . 
+6  b w w w . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=12 w=18]
+1  . b b b b . . . 
+2  b w b b . . . . 
+3  b w w w w . . . 
+4  b w b w w w . . 
+5  b w w w w w . . 
+6  b w w w . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+score=10747 at 36
+score=7665 at 65
+score=5803 at 47
+score=5945 at 57
+score=-1 at 25
+score=4610 at 67
+score=4635 at 73
+score=5768 at 74
+score=6321 at 75
+score=-3994 at 72
+bestie score=10747 at 36
+   1 2 3 4 5 6 7 8 [b=17 w=14]
+1  . b b b b . . . 
+2  b w b b . . . . 
+3  b b b b b b . . 
+4  b w b w w w . . 
+5  b w w w w w . . 
+6  b w w w . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=12 w=20]
+1  . b b b b . . . 
+2  b w w w w . . . 
+3  b b b w w b . . 
+4  b w w w w w . . 
+5  b w w w w w . . 
+6  b w w w . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+score=5730 at 11
+score=10759 at 16
+score=7953 at 65
+score=12094 at 47
+score=6700 at 57
+score=-2889 at 26
+score=5639 at 67
+score=5433 at 73
+score=8417 at 74
+score=7395 at 75
+score=7958 at 76
+score=7660 at 72
+score=7098 at 77
+bestie score=12094 at 47
+   1 2 3 4 5 6 7 8 [b=18 w=15]
+1  . b b b b . . . 
+2  b w w w w . . . 
+3  b b b w w b . . 
+4  b b b b b b b . 
+5  b w w w w w . . 
+6  b w w w . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=17 w=17]
+1  . b b b b . . . 
+2  b w w w w . . . 
+3  b b b w w b . . 
+4  b b b b b w b . 
+5  b w w w w w w . 
+6  b w w w . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+score=5686 at 11
+score=16930 at 16
+score=6185 at 68
+score=6541 at 58
+score=6325 at 65
+score=8866 at 67
+score=-1871 at 26
+score=4520 at 73
+score=5772 at 74
+score=8939 at 75
+score=8621 at 76
+score=15237 at 71
+score=7437 at 72
+score=6105 at 77
+bestie score=16930 at 16
+   1 2 3 4 5 6 7 8 [b=20 w=15]
+1  . b b b b b . . 
+2  b w w w b . . . 
+3  b b b b w b . . 
+4  b b b b b w b . 
+5  b w w w w w w . 
+6  b w w w . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=19 w=17]
+1  . b b b b b . . 
+2  b w w w b . . . 
+3  b b b b w b . w 
+4  b b b b b w w . 
+5  b w w w w w w . 
+6  b w w w . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+score=9488 at 11
+score=5209 at 68
+score=5856 at 58
+score=6563 at 48
+score=6578 at 65
+score=5467 at 67
+score=34971 at 26
+score=4482 at 73
+score=4725 at 74
+score=5954 at 75
+score=5533 at 76
+score=25755 at 71
+score=8611 at 72
+score=4900 at 77
+bestie score=34971 at 26
+   1 2 3 4 5 6 7 8 [b=21 w=16]
+1  . b b b b b . . 
+2  b w w w b b . . 
+3  b b b b b b . w 
+4  b b b b b w w . 
+5  b w w w w w w . 
+6  b w w w . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=17 w=21]
+1  . b b b b b . . 
+2  b w w w w w w . 
+3  b b b b b w . w 
+4  b b b b w w w . 
+5  b w w w w w w . 
+6  b w w w . w . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+score=-1 at 11
+score=20205 at 68
+score=6230 at 58
+score=13197 at 48
+score=24147 at 65
+score=21863 at 67
+score=21763 at 37
+score=16518 at 73
+score=18607 at 74
+score=21922 at 75
+score=8810 at 76
+score=377 at 28
+score=34379 at 71
+score=-1 at 17
+score=27624 at 72
+score=12166 at 77
+bestie score=34379 at 71
+   1 2 3 4 5 6 7 8 [b=20 w=19]
+1  . b b b b b . . 
+2  b w w w w w w . 
+3  b b b b b w . w 
+4  b b b b w w w . 
+5  b w b w w w w . 
+6  b b w w . w . . 
+7  b . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=19 w=21]
+1  . b b b b b . . 
+2  b w w w w w w . 
+3  b b b b b w . w 
+4  b b b b w w w . 
+5  b w b w w w w . 
+6  b w w w . w . . 
+7  b w . . . . . . 
+8  . . . . . . . . 
+score=-1 at 11
+score=24839 at 68
+score=504 at 83
+score=46275 at 48
+score=15488 at 58
+score=33282 at 65
+score=28695 at 37
+score=10737 at 73
+score=25403 at 74
+score=17789 at 75
+score=11267 at 76
+score=22136 at 67
+score=56 at 28
+score=10432 at 82
+score=-1 at 17
+score=18661 at 77
+bestie score=46275 at 48
+   1 2 3 4 5 6 7 8 [b=23 w=18]
+1  . b b b b b . . 
+2  b w w w w w w . 
+3  b b b b b w . w 
+4  b b b b b b b b 
+5  b w b w w w w . 
+6  b w w w . w . . 
+7  b w . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=21 w=21]
+1  . b b b b b . . 
+2  b w w w w w w . 
+3  b b b b b w . w 
+4  b b b b b b w w 
+5  b w b w w w w w 
+6  b w w w . w . . 
+7  b w . . . . . . 
+8  . . . . . . . . 
+score=608 at 11
+score=1374 at 18
+score=836 at 81
+score=558 at 68
+score=411 at 83
+score=959 at 65
+score=214 at 73
+score=581 at 74
+score=532 at 75
+score=468 at 76
+score=457 at 67
+score=1100 at 37
+score=1418 at 17
+score=328 at 82
+score=32 at 28
+score=507 at 77
+bestie score=1418 at 17
+   1 2 3 4 5 6 7 8 [b=23 w=20]
+1  . b b b b b b . 
+2  b w w w w b w . 
+3  b b b b b w . w 
+4  b b b b b b w w 
+5  b w b w w w w w 
+6  b w w w . w . . 
+7  b w . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=22 w=22]
+1  . b b b b b b . 
+2  b w w w w b w . 
+3  b b b b b w w w 
+4  b b b b b w w w 
+5  b w b w w w w w 
+6  b w w w . w . . 
+7  b w . . . . . . 
+8  . . . . . . . . 
+score=-1 at 11
+score=2310 at 18
+score=814 at 81
+score=974 at 68
+score=141 at 83
+score=937 at 65
+score=535 at 74
+score=593 at 75
+score=471 at 76
+score=131 at 67
+score=352 at 73
+score=448 at 82
+score=34 at 28
+score=260 at 77
+bestie score=2310 at 18
+   1 2 3 4 5 6 7 8 [b=25 w=20]
+1  . b b b b b b b 
+2  b w w w w b b . 
+3  b b b b b b w w 
+4  b b b b b w w w 
+5  b w b w w w w w 
+6  b w w w . w . . 
+7  b w . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=23 w=23]
+1  . b b b b b b b 
+2  b w w w w w w w 
+3  b b b b b b w w 
+4  b b b b b w w w 
+5  b w b w w w w w 
+6  b w w w . w . . 
+7  b w . . . . . . 
+8  . . . . . . . . 
+score=-1 at 11
+score=1179 at 81
+score=1501 at 68
+score=308 at 83
+score=1133 at 65
+score=838 at 74
+score=1077 at 75
+score=860 at 76
+score=652 at 67
+score=383 at 73
+score=420 at 82
+score=598 at 77
+bestie score=1501 at 68
+   1 2 3 4 5 6 7 8 [b=30 w=17]
+1  . b b b b b b b 
+2  b w w w w w w b 
+3  b b b b b b w b 
+4  b b b b b b w b 
+5  b w b w w w b b 
+6  b w w w . w . b 
+7  b w . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=29 w=19]
+1  . b b b b b b b 
+2  b w w w w w w b 
+3  b b b b b b w b 
+4  b b b b b b w b 
+5  b w b w w w w b 
+6  b w w w . w w b 
+7  b w . . . . . . 
+8  . . . . . . . . 
+score=-1 at 11
+score=905 at 81
+score=227 at 83
+score=787 at 65
+score=804 at 75
+score=796 at 76
+score=364 at 73
+score=895 at 74
+score=472 at 82
+score=839 at 78
+score=582 at 77
+bestie score=905 at 81
+   1 2 3 4 5 6 7 8 [b=33 w=16]
+1  . b b b b b b b 
+2  b w w w w w w b 
+3  b b b b b b w b 
+4  b b b b b b w b 
+5  b w b b w w w b 
+6  b w b w . w w b 
+7  b b . . . . . . 
+8  b . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=29 w=21]
+1  . b b b b b b b 
+2  b w w w w w w b 
+3  b b w b b b w b 
+4  b b w b b b w b 
+5  b w w b w w w b 
+6  b w w w . w w b 
+7  b b w . . . . . 
+8  b . . . . . . . 
+score=983 at 11
+score=680 at 83
+score=619 at 84
+score=281 at 65
+score=311 at 76
+score=542 at 74
+score=606 at 75
+score=972 at 78
+score=683 at 82
+score=345 at 77
+bestie score=983 at 11
+   1 2 3 4 5 6 7 8 [b=32 w=19]
+1  b b b b b b b b 
+2  b b w w w w w b 
+3  b b b b b b w b 
+4  b b w b b b w b 
+5  b w w b w w w b 
+6  b w w w . w w b 
+7  b b w . . . . . 
+8  b . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=31 w=21]
+1  b b b b b b b b 
+2  b b w w w w w b 
+3  b b b b b b w b 
+4  b b w b b b w b 
+5  b w w w w w w b 
+6  b w w w w w w b 
+7  b b w . . . . . 
+8  b . . . . . . . 
+score=672 at 83
+score=863 at 84
+score=180 at 76
+score=319 at 74
+score=354 at 75
+score=863 at 78
+score=527 at 82
+score=251 at 77
+bestie score=863 at 84
+   1 2 3 4 5 6 7 8 [b=34 w=19]
+1  b b b b b b b b 
+2  b b w w w w w b 
+3  b b b b b b w b 
+4  b b w b b b w b 
+5  b w w w w w w b 
+6  b b w w w w w b 
+7  b b b . . . . . 
+8  b . . b . . . . 
+   1 2 3 4 5 6 7 8 [b=33 w=21]
+1  b b b b b b b b 
+2  b b w w w w w b 
+3  b b b b b b w b 
+4  b b w b b b w b 
+5  b w w w w w w b 
+6  b b w w w w w b 
+7  b b w . . . . . 
+8  b . w b . . . . 
+score=178 at 74
+score=315 at 75
+score=182 at 76
+score=294 at 78
+score=588 at 82
+score=28 at 77
+bestie score=588 at 82
+   1 2 3 4 5 6 7 8 [b=38 w=17]
+1  b b b b b b b b 
+2  b b w w w w w b 
+3  b b b b b b w b 
+4  b b w b b b w b 
+5  b w w w b w w b 
+6  b b w b w w w b 
+7  b b b . . . . . 
+8  b b b b . . . . 
+   1 2 3 4 5 6 7 8 [b=37 w=19]
+1  b b b b b b b b 
+2  b b w w w w w b 
+3  b b b b b b w b 
+4  b b w b b b w b 
+5  b w w w b w w b 
+6  b b w w w w w b 
+7  b b b w . . . . 
+8  b b b b . . . . 
+score=-1 at 85
+score=505 at 76
+score=513 at 75
+score=345 at 78
+score=761 at 77
+bestie score=761 at 77
+   1 2 3 4 5 6 7 8 [b=44 w=13]
+1  b b b b b b b b 
+2  b b w w w w b b 
+3  b b b b b b b b 
+4  b b w b b b b b 
+5  b w w w b w b b 
+6  b b w w w b b b 
+7  b b b w . . b . 
+8  b b b b . . . . 
+   1 2 3 4 5 6 7 8 [b=43 w=15]
+1  b b b b b b b b 
+2  b b w w w w b b 
+3  b b b b b b b b 
+4  b b w b b b b b 
+5  b w w w b w b b 
+6  b b w w w w b b 
+7  b b b w . w b . 
+8  b b b b . . . . 
+score=-1 at 86
+score=-1 at 85
+score=-1 at 75
+score=-1 at 87
+bestie score=-1 at 86
+   1 2 3 4 5 6 7 8 [b=47 w=12]
+1  b b b b b b b b 
+2  b b w w w w b b 
+3  b b b b b b b b 
+4  b b w b b b b b 
+5  b w w w b b b b 
+6  b b w w w b b b 
+7  b b b w . b b . 
+8  b b b b . b . . 
+   1 2 3 4 5 6 7 8 [b=43 w=17]
+1  b b b b b b b b 
+2  b b w w w w b b 
+3  b b b w b b b b 
+4  b b w b w b b b 
+5  b w w w b w b b 
+6  b b w w w b w b 
+7  b b b w . b b w 
+8  b b b b . b . . 
+score=-1 at 88
+score=-1 at 85
+score=-1 at 75
+bestie score=-1 at 88
+   1 2 3 4 5 6 7 8 [b=45 w=16]
+1  b b b b b b b b 
+2  b b w w w w b b 
+3  b b b w b b b b 
+4  b b w b w b b b 
+5  b w w w b w b b 
+6  b b w w w b w b 
+7  b b b w . b b b 
+8  b b b b . b . b 
+   1 2 3 4 5 6 7 8 [b=44 w=18]
+1  b b b b b b b b 
+2  b b w w w w b b 
+3  b b b w b b b b 
+4  b b w b w b b b 
+5  b w w w b w b b 
+6  b b w w w b w b 
+7  b b b w . w b b 
+8  b b b b w b . b 
+score=-1 at 75
+score=-1 at 87
+bestie score=-1 at 75
+   1 2 3 4 5 6 7 8 [b=50 w=13]
+1  b b b b b b b b 
+2  b b w w w w b b 
+3  b b b w b b b b 
+4  b b w b w b b b 
+5  b w b w b w b b 
+6  b b w b b b w b 
+7  b b b b b b b b 
+8  b b b b w b . b 
+Game over

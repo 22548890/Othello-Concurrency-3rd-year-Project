@@ -1,0 +1,572 @@
+Initialise communication and get player colour 
+   1 2 3 4 5 6 7 8 [b=4 w=1]
+1  . . . . . . . . 
+2  . . . . . . . . 
+3  . . . . . . . . 
+4  . . b b b . . . 
+5  . . . b w . . . 
+6  . . . . . . . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+best score for board =-40 at 33
+   1 2 3 4 5 6 7 8 [b=3 w=3]
+1  . . . . . . . . 
+2  . . . . . . . . 
+3  . . w . . . . . 
+4  . . b w b . . . 
+5  . . . b w . . . 
+6  . . . . . . . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=5 w=2]
+1  . . . . . . . . 
+2  . . b . . . . . 
+3  . . b . . . . . 
+4  . . b w b . . . 
+5  . . . b w . . . 
+6  . . . . . . . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+best score for board =-10 at 53
+   1 2 3 4 5 6 7 8 [b=4 w=4]
+1  . . . . . . . . 
+2  . . b . . . . . 
+3  . . b . . . . . 
+4  . . b w b . . . 
+5  . . w w w . . . 
+6  . . . . . . . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=7 w=2]
+1  . . . . . . . . 
+2  . . b . . . . . 
+3  . . b . . . . . 
+4  . . b w b . . . 
+5  . . b b w . . . 
+6  . . b . . . . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+best score for board =-11 at 52
+   1 2 3 4 5 6 7 8 [b=5 w=5]
+1  . . . . . . . . 
+2  . . b . . . . . 
+3  . . b . . . . . 
+4  . . b w b . . . 
+5  . w w w w . . . 
+6  . . b . . . . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=8 w=3]
+1  . . . . . . . . 
+2  . . b . . . . . 
+3  . . b . . . . . 
+4  . . b b b . . . 
+5  . w w w b . . . 
+6  . . b . . b . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+best score for board =-11 at 34
+   1 2 3 4 5 6 7 8 [b=6 w=6]
+1  . . . . . . . . 
+2  . . b . . . . . 
+3  . . b w . . . . 
+4  . . w w b . . . 
+5  . w w w b . . . 
+6  . . b . . b . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=10 w=3]
+1  . . . . . . . . 
+2  . . b . . . . . 
+3  . . b w . . . . 
+4  . . w w b . . . 
+5  b b b b b . . . 
+6  . . b . . b . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+best score for board =-13 at 64
+   1 2 3 4 5 6 7 8 [b=9 w=5]
+1  . . . . . . . . 
+2  . . b . . . . . 
+3  . . b w . . . . 
+4  . . w w b . . . 
+5  b b b w b . . . 
+6  . . b w . b . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=12 w=3]
+1  . . . . . . . . 
+2  . . b . b . . . 
+3  . . b b . . . . 
+4  . . b w b . . . 
+5  b b b w b . . . 
+6  . . b w . b . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+best score for board =0 at 42
+   1 2 3 4 5 6 7 8 [b=10 w=6]
+1  . . . . . . . . 
+2  . . b . b . . . 
+3  . . b b . . . . 
+4  . w w w b . . . 
+5  b b w w b . . . 
+6  . . b w . b . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=12 w=5]
+1  . . . . . . . . 
+2  . . b . b . . . 
+3  . . b b . . . . 
+4  . w w w b . . . 
+5  b b w w b . . . 
+6  . . b b b b . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+best score for board =26 at 13
+   1 2 3 4 5 6 7 8 [b=10 w=8]
+1  . . w . . . . . 
+2  . . w . b . . . 
+3  . . w b . . . . 
+4  . w w w b . . . 
+5  b b w w b . . . 
+6  . . b b b b . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=13 w=6]
+1  . . w . . . . . 
+2  . . w . b . . . 
+3  b . w b . . . . 
+4  . b w w b . . . 
+5  b b b w b . . . 
+6  . . b b b b . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+best score for board =13 at 24
+   1 2 3 4 5 6 7 8 [b=12 w=8]
+1  . . w . . . . . 
+2  . . w w b . . . 
+3  b . w w . . . . 
+4  . b w w b . . . 
+5  b b b w b . . . 
+6  . . b b b b . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=15 w=6]
+1  . . w . b . . . 
+2  . . w b b . . . 
+3  b . b w . . . . 
+4  . b w w b . . . 
+5  b b b w b . . . 
+6  . . b b b b . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+best score for board =81 at 32
+   1 2 3 4 5 6 7 8 [b=14 w=8]
+1  . . w . b . . . 
+2  . . w b b . . . 
+3  b w w w . . . . 
+4  . b w w b . . . 
+5  b b b w b . . . 
+6  . . b b b b . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=19 w=4]
+1  . . w . b . . . 
+2  . . w b b . . . 
+3  b b b b b . . . 
+4  . b w b b . . . 
+5  b b b w b . . . 
+6  . . b b b b . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+best score for board =63 at 41
+   1 2 3 4 5 6 7 8 [b=17 w=7]
+1  . . w . b . . . 
+2  . . w b b . . . 
+3  b w b b b . . . 
+4  w w w b b . . . 
+5  b b b w b . . . 
+6  . . b b b b . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=21 w=4]
+1  . . w . b . . . 
+2  b . w b b . . . 
+3  b b b b b . . . 
+4  w w b b b . . . 
+5  b b b b b . . . 
+6  . . b b b b . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+best score for board =107 at 11
+   1 2 3 4 5 6 7 8 [b=19 w=7]
+1  w . w . b . . . 
+2  w . w b b . . . 
+3  w b b b b . . . 
+4  w w b b b . . . 
+5  b b b b b . . . 
+6  . . b b b b . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=21 w=6]
+1  w . w b b . . . 
+2  w . b b b . . . 
+3  w b b b b . . . 
+4  w w b b b . . . 
+5  b b b b b . . . 
+6  . . b b b b . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+best score for board =146 at 61
+   1 2 3 4 5 6 7 8 [b=20 w=8]
+1  w . w b b . . . 
+2  w . b b b . . . 
+3  w b b b b . . . 
+4  w w b b b . . . 
+5  w b b b b . . . 
+6  w . b b b b . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=22 w=7]
+1  w b b b b . . . 
+2  w . b b b . . . 
+3  w b b b b . . . 
+4  w w b b b . . . 
+5  w b b b b . . . 
+6  w . b b b b . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+best score for board =171 at 62
+   1 2 3 4 5 6 7 8 [b=21 w=9]
+1  w b b b b . . . 
+2  w . b b b . . . 
+3  w b b b b . . . 
+4  w w b b b . . . 
+5  w w b b b . . . 
+6  w w b b b b . . 
+7  . . . . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=23 w=8]
+1  w b b b b . . . 
+2  w . b b b . . . 
+3  w b b b b . . . 
+4  w w b b b . . . 
+5  w w b b b . . . 
+6  w b b b b b . . 
+7  b . . . . . . . 
+8  . . . . . . . . 
+best score for board =175 at 73
+   1 2 3 4 5 6 7 8 [b=22 w=10]
+1  w b b b b . . . 
+2  w . b b b . . . 
+3  w b b b b . . . 
+4  w w b b b . . . 
+5  w w b b b . . . 
+6  w w b b b b . . 
+7  b . w . . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=26 w=7]
+1  w b b b b . . . 
+2  w . b b b . . . 
+3  w b b b b . . . 
+4  w b b b b . . . 
+5  w b b b b . . . 
+6  w b b b b b . . 
+7  b b w . . . . . 
+8  . . . . . . . . 
+best score for board =238 at 74
+   1 2 3 4 5 6 7 8 [b=24 w=10]
+1  w b b b b . . . 
+2  w . b b b . . . 
+3  w b b b b . . . 
+4  w b b b b . . . 
+5  w w b b b . . . 
+6  w b w b b b . . 
+7  b b w w . . . . 
+8  . . . . . . . . 
+   1 2 3 4 5 6 7 8 [b=28 w=7]
+1  w b b b b . . . 
+2  w . b b b . . . 
+3  w b b b b . . . 
+4  w b b b b . . . 
+5  w w b b b . . . 
+6  w b b b b b . . 
+7  b b b b . . . . 
+8  . . b . . . . . 
+best score for board =245 at 56
+   1 2 3 4 5 6 7 8 [b=25 w=11]
+1  w b b b b . . . 
+2  w . b b b . . . 
+3  w b b b b . . . 
+4  w b b b b . . . 
+5  w w w w w w . . 
+6  w b b b b b . . 
+7  b b b b . . . . 
+8  . . b . . . . . 
+   1 2 3 4 5 6 7 8 [b=28 w=9]
+1  w b b b b . . . 
+2  w . b b b . . . 
+3  w b b b b . . . 
+4  w b b b b b . . 
+5  w w w w b b . . 
+6  w b b b b b . . 
+7  b b b b . . . . 
+8  . . b . . . . . 
+best score for board =283 at 16
+   1 2 3 4 5 6 7 8 [b=21 w=17]
+1  w w w w w w . . 
+2  w . b b w . . . 
+3  w b b w b . . . 
+4  w b w b b b . . 
+5  w w w w b b . . 
+6  w b b b b b . . 
+7  b b b b . . . . 
+8  . . b . . . . . 
+   1 2 3 4 5 6 7 8 [b=23 w=16]
+1  w w w w w w . . 
+2  w . b b b b . . 
+3  w b b w b . . . 
+4  w b w b b b . . 
+5  w w w w b b . . 
+6  w b b b b b . . 
+7  b b b b . . . . 
+8  . . b . . . . . 
+best score for board =361 at 76
+   1 2 3 4 5 6 7 8 [b=22 w=18]
+1  w w w w w w . . 
+2  w . b b b b . . 
+3  w b b w b . . . 
+4  w b w b b b . . 
+5  w w w w b b . . 
+6  w b b b w b . . 
+7  b b b b . w . . 
+8  . . b . . . . . 
+   1 2 3 4 5 6 7 8 [b=24 w=17]
+1  w w w w w w . . 
+2  w . b b b b . . 
+3  w b b w b . . . 
+4  w b w b b b . . 
+5  w w w w b b . . 
+6  w b b b b b . . 
+7  b b b b b w . . 
+8  . . b . . . . . 
+best score for board =359 at 22
+   1 2 3 4 5 6 7 8 [b=22 w=20]
+1  w w w w w w . . 
+2  w w b b b b . . 
+3  w w b w b . . . 
+4  w w w b b b . . 
+5  w w w w b b . . 
+6  w b b b b b . . 
+7  b b b b b w . . 
+8  . . b . . . . . 
+   1 2 3 4 5 6 7 8 [b=24 w=19]
+1  w w w w w w . . 
+2  w w b b b b . . 
+3  w w b w b . . . 
+4  w w w b b b . . 
+5  w w w w b b . . 
+6  w b b b b b . . 
+7  b b b b b b . . 
+8  . . b . . b . . 
+best score for board =612 at 27
+   1 2 3 4 5 6 7 8 [b=20 w=24]
+1  w w w w w w . . 
+2  w w w w w w w . 
+3  w w b w b . . . 
+4  w w w b b b . . 
+5  w w w w b b . . 
+6  w b b b b b . . 
+7  b b b b b b . . 
+8  . . b . . b . . 
+   1 2 3 4 5 6 7 8 [b=22 w=23]
+1  w w w w w w b . 
+2  w w w w w b w . 
+3  w w b w b . . . 
+4  w w w b b b . . 
+5  w w w w b b . . 
+6  w b b b b b . . 
+7  b b b b b b . . 
+8  . . b . . b . . 
+best score for board =974 at 37
+   1 2 3 4 5 6 7 8 [b=21 w=25]
+1  w w w w w w b . 
+2  w w w w w w w . 
+3  w w b w b . w . 
+4  w w w b b b . . 
+5  w w w w b b . . 
+6  w b b b b b . . 
+7  b b b b b b . . 
+8  . . b . . b . . 
+   1 2 3 4 5 6 7 8 [b=24 w=23]
+1  w w w w w w b . 
+2  w w w w w w b . 
+3  w w b w b . b . 
+4  w w w b b b b . 
+5  w w w w b b . . 
+6  w b b b b b . . 
+7  b b b b b b . . 
+8  . . b . . b . . 
+best score for board =1000 at 81
+   1 2 3 4 5 6 7 8 [b=21 w=27]
+1  w w w w w w b . 
+2  w w w w w w b . 
+3  w w b w b . b . 
+4  w w w b b b b . 
+5  w w w w b b . . 
+6  w b w b b b . . 
+7  w w b b b b . . 
+8  w . b . . b . . 
+   1 2 3 4 5 6 7 8 [b=23 w=26]
+1  w w w w w w b . 
+2  w w w w w w b . 
+3  w w b w b . b . 
+4  w w w b b b b . 
+5  w w w w b b . . 
+6  w b w b b b . . 
+7  w b b b b b . . 
+8  w b b . . b . . 
+best score for board =821 at 85
+   1 2 3 4 5 6 7 8 [b=17 w=33]
+1  w w w w w w b . 
+2  w w w w w w b . 
+3  w w b w w . b . 
+4  w w w b w b b . 
+5  w w w w w b . . 
+6  w b w b w b . . 
+7  w b b w w b . . 
+8  w b b . w b . . 
+   1 2 3 4 5 6 7 8 [b=23 w=28]
+1  w w w w w w b . 
+2  w w w w w w b . 
+3  w w b b b b b . 
+4  w w w b b b b . 
+5  w w w b w b . . 
+6  w b b b w b . . 
+7  w b b w w b . . 
+8  w b b . w b . . 
+best score for board =356 at 18
+   1 2 3 4 5 6 7 8 [b=16 w=36]
+1  w w w w w w w w 
+2  w w w w w w w . 
+3  w w b b b w b . 
+4  w w w b w b b . 
+5  w w w w w b . . 
+6  w b w b w b . . 
+7  w w b w w b . . 
+8  w b b . w b . . 
+   1 2 3 4 5 6 7 8 [b=20 w=33]
+1  w w w w w w w w 
+2  w w w w w w w . 
+3  w w b b b w b . 
+4  w w w b w b b . 
+5  w w w w w b . . 
+6  w b w b w b . . 
+7  w w b b b b . . 
+8  w b b b b b . . 
+best score for board =321 at 87
+   1 2 3 4 5 6 7 8 [b=14 w=40]
+1  w w w w w w w w 
+2  w w w w w w w . 
+3  w w b b b w b . 
+4  w w w b w b b . 
+5  w w w w w b . . 
+6  w b w b w b . . 
+7  w w b b b w . . 
+8  w w w w w w w . 
+   1 2 3 4 5 6 7 8 [b=16 w=39]
+1  w w w w w w w w 
+2  w w w w w w w . 
+3  w w b b b w b . 
+4  w w w b w b b . 
+5  w w w w w b . . 
+6  w b w b w b . . 
+7  w w b b b b b . 
+8  w w w w w w w . 
+best score for board =227 at 28
+   1 2 3 4 5 6 7 8 [b=14 w=42]
+1  w w w w w w w w 
+2  w w w w w w w w 
+3  w w b b b w w . 
+4  w w w b w w b . 
+5  w w w w w b . . 
+6  w b w b w b . . 
+7  w w b b b b b . 
+8  w w w w w w w . 
+   1 2 3 4 5 6 7 8 [b=17 w=40]
+1  w w w w w w w w 
+2  w w w w w w w w 
+3  w w b b b b b b 
+4  w w w b w w b . 
+5  w w w w w b . . 
+6  w b w b w b . . 
+7  w w b b b b b . 
+8  w w w w w w w . 
+best score for board =214 at 88
+   1 2 3 4 5 6 7 8 [b=15 w=43]
+1  w w w w w w w w 
+2  w w w w w w w w 
+3  w w b b b b b b 
+4  w w w b w w b . 
+5  w w w w w b . . 
+6  w b w b w w . . 
+7  w w b b b b w . 
+8  w w w w w w w w 
+   1 2 3 4 5 6 7 8 [b=18 w=41]
+1  w w w w w w w w 
+2  w w w w w w w w 
+3  w w b b b b b b 
+4  w w w b w b b . 
+5  w w w w w b b . 
+6  w b w b w b . . 
+7  w w b b b b w . 
+8  w w w w w w w w 
+best score for board =-1 at 48
+   1 2 3 4 5 6 7 8 [b=11 w=49]
+1  w w w w w w w w 
+2  w w w w w w w w 
+3  w w b b b b w w 
+4  w w w b w w w w 
+5  w w w w w b w . 
+6  w b w b w w . . 
+7  w w b b w b w . 
+8  w w w w w w w w 
+   1 2 3 4 5 6 7 8 [b=14 w=47]
+1  w w w w w w w w 
+2  w w w w w w w w 
+3  w w b b b b w w 
+4  w w w b w w b w 
+5  w w w w w b b b 
+6  w b w b w w . . 
+7  w w b b w b w . 
+8  w w w w w w w w 
+best score for board =-1 at 67
+   1 2 3 4 5 6 7 8 [b=10 w=52]
+1  w w w w w w w w 
+2  w w w w w w w w 
+3  w w b b b b w w 
+4  w w w b w w w w 
+5  w w w w w w w b 
+6  w b w b w w w . 
+7  w w b b w w w . 
+8  w w w w w w w w 
+   1 2 3 4 5 6 7 8 [b=16 w=47]
+1  w w w w w w w w 
+2  w w w w w w w w 
+3  w w b b b b w w 
+4  w w w b w b w w 
+5  w w w w w w b b 
+6  w b w b b b b b 
+7  w w b b w w w . 
+8  w w w w w w w w 
+best score for board =-1 at 78
+   1 2 3 4 5 6 7 8 [b=13 w=51]
+1  w w w w w w w w 
+2  w w w w w w w w 
+3  w w b b b b w w 
+4  w w w b w b w w 
+5  w w w w w w b w 
+6  w b w b b b w w 
+7  w w b b w w w w 
+8  w w w w w w w w 
+Game over

@@ -45,9 +45,9 @@
 const int EMPTY = 0;
 const int BLACK = 1;
 const int WHITE = 2;
-const int MAX = 1000;
-const int MIN = -1000;
-const int MAXDEPTH = 6;
+const int MAX = 1000000000;
+const int MIN = -1000000000;
+const int MAXDEPTH = 7;
 
 const int OUTER = 3;
 const int ALLDIRECTIONS[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
@@ -93,6 +93,7 @@ void duplicateBoard(int *board, int *cBoard);
 int evaluateStability(int my_colour, FILE *fp);
 int evaluateCorners(int my_colour, FILE *fp);
 int evaluateGameTime(int my_colour, FILE *fp);
+void sortMoves(int *moves);
 
 int boardWeighted[8][8] = {{100, -10, 11, 6, 6, 11, -10, 100},
 						   {-10, -20, 1, 2, 2, 1, -20, -10},
@@ -382,13 +383,15 @@ void legal_moves(int player, int *moves, FILE *fp)
 	int move, i;
 	moves[0] = 0;
 	i = 0;
-	for (move = 11; move <= 88; move++)
+	for (move = 11; move <= 88; move++){
 		if (legalp(move, player, fp))
 		{
 			i++;
 			moves[i] = move;
 		}
+	}
 	moves[0] = i;
+	sortMoves(moves);
 }
 
 int legalp(int move, int player, FILE *fp)
@@ -503,7 +506,7 @@ int find_highestPos(int *moves)
 	{
 		x = moves[i] / 10;
 		y = moves[i] % 10;
-		int val = boardWeighted[x - 1][y - 1];
+		int val = stabilityWeights2[x - 1][y - 1];
 		if (val > max)
 		{
 			max = val;
@@ -511,6 +514,36 @@ int find_highestPos(int *moves)
 		}
 	}
 	return max_i;
+}
+
+void sortMoves(int *moves) //based on stability
+{
+	int *movesValues = (int *)malloc(LEGALMOVSBUFSIZE * sizeof(int));
+	movesValues[0]=0;
+	int x, y;
+	for (int i = 1; i <= moves[0]; i++)
+	{
+		x = moves[i] / 10;
+		y = moves[i] % 10;
+		int val = (stabilityWeights2[x - 1][y - 1]) + (cornersWeights[x - 1][y - 1]/3);
+		movesValues[i]=val;
+	}//add move values to array
+
+
+	for (int i = 1; i <= moves[0]; ++i)
+	{
+		for (int j=i+1; j<= moves[0];++j){
+			if (movesValues[i]<movesValues[j]){
+				int tempValue=movesValues[i];
+				int tempMove=moves[i];
+				movesValues[i]=movesValues[j];
+				moves[i]=moves[j];
+				movesValues[j]=tempValue;
+				moves[j]=tempMove;
+			}
+		}
+	}
+	free(movesValues);
 }
 
 int minimax_strategy(int my_colour, FILE *fp)
@@ -540,8 +573,9 @@ int minimax_strategy(int my_colour, FILE *fp)
 				best_score = score;
 				best_move = moves[i];
 			}
+			fprintf(fp, "score=%d at %d\n", score, loc);
 		}
-		fprintf(fp, "best score for board =%d at %d\n", best_score, best_move);
+		fprintf(fp, "bestie score=%d at %d\n", best_score, best_move);
 		duplicateBoard(original_board, board); //reset board to original_board before move
 		free(moves);
 		free_this_board(original_board);
@@ -644,20 +678,22 @@ int evaluatePosition(int my_colour, FILE *fp)
 	int cornerEdgeScore = evaluateCorners(my_colour, fp);
 	int gameTime = evaluateGameTime(my_colour, fp);
 
-	if (gameTime == 0)
-	{
-		return  ((stabilityScore) + (mobilityScore * 5)+ (discDifference) + (cornerEdgeScore))/4;
-	}
-	else if (gameTime == 1)
-	{
-		return  ((stabilityScore * 2) + (mobilityScore * 3) + (discDifference) + (cornerEdgeScore*2))/4;
-	}
-	else
-	{
-		return  ((stabilityScore*3) + (mobilityScore * 2) + (discDifference*5) + (cornerEdgeScore*3))/4;
-	}
+	
+	// if (gameTime == 0)
+	// {
+	// 	return (stabilityScore * 0.56) + (mobilityScore * 3*2) + (discDifference * 0.92) + (cornerEdgeScore * 1.2 );
+	// }
+	// else if (gameTime == 1)
+	// {
+	// 	return (stabilityScore * 0.56*2) + (mobilityScore * 3 ) + (discDifference * 0.92*2) + (cornerEdgeScore * 1.2 *4);
+	// }
+	// else
+	// {
+	// 	return (stabilityScore * 0.56) + (mobilityScore * 3 ) + (discDifference * 0.92*2) + (cornerEdgeScore * 1.2 );
+	// }
 	//return 2 * mobilityScore + discDifference;
-	// return (stabilityScore * 0.3) + (mobilityScore * 0.3) + (discDifference * 0.05) + (cornerEdgeScore * 0.35);
+	  return (stabilityScore * 0.56) + (mobilityScore * 3) + (discDifference * 0.92*2) + (cornerEdgeScore * 1.2);//best
+	//  return (stabilityScore * 0.3) + (mobilityScore * 0.3) + (discDifference * 0.05) + (cornerEdgeScore * 0.35);
 }
 
 int evaluateMobility(int my_colour, FILE *fp)
