@@ -51,7 +51,7 @@ const int ALLDIRECTIONS[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
 const int BOARDSIZE = 100;
 
 const int LEGALMOVSBUFSIZE = 65;
-const char piecenames[4] = {'.', 'b', 'w', '?'};
+const char piecenames[4] = {'.','b','w','?'};
 
 void run_master(int argc, char *argv[]);
 int initialise_master(int argc, char *argv[], int *time_limit, int *my_colour, FILE **fp);
@@ -71,49 +71,31 @@ int find_bracket_piece(int square, int dir, int player, FILE *fp);
 int random_strategy(int my_colour, FILE *fp);
 void make_move(int move, int player, FILE *fp);
 void make_flips(int move, int dir, int player, FILE *fp);
-int get_loc(char *movestring);
+int get_loc(char* movestring);
 void get_move_string(int loc, char *ms);
 void print_board(FILE *fp);
 char nameof(int piece);
-int count(int player, int *board);
-
-int location_strategy(int my_colour, FILE *fp);
-int find_highestPos(int* moves);
-
-int boardWeighted[8][8]={{100, -10,	11,	6,	6,	11,	-10,	100},
-						{-10, -20,	1,	2,	2,	1,	-20,	-10},
-						{10,	1,	5,	4,	4,	5,	1,		10},
-						{6,		2,	4,	2,	2,	4,	2,		6},
-						{6,		2,	4,	2,	2,	4,	2,		6},
-						{10,	1,	5,	4,	4,	5,	1,		10},
-						{-10, -20,	1,	2,	2,	1,	-20,	-10},
-						{100, -10,	11,	6,	6,	11,	-10,	100}};
+int count(int player, int * board);
 
 int *board;
 
-
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 	int rank;
 
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
+ 
 	initialise_board(); //one for each process
 
-	if (rank == 0)
-	{
-		run_master(argc, argv);
-	}
-	else
-	{
-		run_worker(rank);
+	if (rank == 0) {
+	    run_master(argc, argv);
+	} else {
+	    run_worker(rank);
 	}
 	game_over();
 }
 
-void run_master(int argc, char *argv[])
-{
+void run_master(int argc, char *argv[]) {
 	char cmd[CMDBUFSIZE];
 	char my_move[MOVEBUFSIZE];
 	char opponent_move[MOVEBUFSIZE];
@@ -122,19 +104,15 @@ void run_master(int argc, char *argv[])
 	int running = 0;
 	FILE *fp = NULL;
 
-	if (initialise_master(argc, argv, &time_limit, &my_colour, &fp) != FAILURE)
-	{
+	if (initialise_master(argc, argv, &time_limit, &my_colour, &fp) != FAILURE) {
 		running = 1;
 	}
-	if (my_colour == EMPTY)
-		my_colour = BLACK;
+	if (my_colour == EMPTY) my_colour = BLACK;
 	// Broadcast my_colour
 
-	while (running == 1)
-	{
+	while (running == 1) {
 		/* Receive next command from referee */
-		if (comms_get_cmd(cmd, opponent_move) == FAILURE)
-		{
+		if (comms_get_cmd(cmd, opponent_move) == FAILURE) {
 			fprintf(fp, "Error getting cmd\n");
 			fflush(fp);
 			running = 0;
@@ -142,104 +120,78 @@ void run_master(int argc, char *argv[])
 		}
 
 		/* Received game_over message */
-		if (strcmp(cmd, "game_over") == 0)
-		{
+		if (strcmp(cmd, "game_over") == 0) {
 			running = 0;
 			fprintf(fp, "Game over\n");
 			fflush(fp);
 			break;
 
-			/* Received gen_move message */
-		}
-		else if (strcmp(cmd, "gen_move") == 0)
-		{
+		/* Received gen_move message */
+		} else if (strcmp(cmd, "gen_move") == 0) {
 			// Broadcast running
-			// Broadcast board
+			// Broadcast board 
 
 			gen_move_master(my_move, my_colour, fp);
 			print_board(fp);
 
-			if (comms_send_move(my_move) == FAILURE)
-			{
+			if (comms_send_move(my_move) == FAILURE) { 
 				running = 0;
 				fprintf(fp, "Move send failed\n");
 				fflush(fp);
 				break;
 			}
 
-			/* Received opponent's move (play_move mesage) */
-		}
-		else if (strcmp(cmd, "play_move") == 0)
-		{
+		/* Received opponent's move (play_move mesage) */
+		} else if (strcmp(cmd, "play_move") == 0) {
 			apply_opp_move(opponent_move, my_colour, fp);
 			print_board(fp);
 
-			/* Received unknown message */
-		}
-		else
-		{
+		/* Received unknown message */
+		} else {
 			fprintf(fp, "Received unknown command from referee\n");
 		}
+		
 	}
 	// Broadcast running
 }
 
-int initialise_master(int argc, char *argv[], int *time_limit, int *my_colour, FILE **fp)
-{
+int initialise_master(int argc, char *argv[], int *time_limit, int *my_colour, FILE **fp) {
 	int result = FAILURE;
 
-	if (argc == 5)
-	{
+	if (argc == 5) { 
 		unsigned long ip = inet_addr(argv[1]);
 		int port = atoi(argv[2]);
 		*time_limit = atoi(argv[3]);
 
 		*fp = fopen(argv[4], "w");
-		if (*fp != NULL)
-		{
+		if (*fp != NULL) {
 			fprintf(*fp, "Initialise communication and get player colour \n");
-			if (comms_init_network(my_colour, ip, port) != FAILURE)
-			{
+			if (comms_init_network(my_colour, ip, port) != FAILURE) {
 				result = SUCCESS;
 			}
 			fflush(*fp);
-		}
-		else
-		{
+		} else {
 			fprintf(stderr, "File %s could not be opened", argv[4]);
 		}
-	}
-	else
-	{
+	} else {
 		fprintf(*fp, "Arguments: <ip> <port> <time_limit> <filename> \n");
 	}
-
+	
 	return result;
 }
 
-void initialise_board()
-{
+void initialise_board() {
 	int i;
-	board = (int *)malloc(BOARDSIZE * sizeof(int));
-	for (i = 0; i <= 9; i++)
-		board[i] = OUTER;
-	for (i = 10; i <= 89; i++)
-	{
-		if (i % 10 >= 1 && i % 10 <= 8)
-			board[i] = EMPTY;
-		else
-			board[i] = OUTER;
+	board = (int *) malloc(BOARDSIZE * sizeof(int));
+	for (i = 0; i <= 9; i++) board[i] = OUTER;
+	for (i = 10; i <= 89; i++) {
+		if (i%10 >= 1 && i%10 <= 8) board[i] = EMPTY; else board[i] = OUTER;
 	}
-	for (i = 90; i <= 99; i++)
-		board[i] = OUTER;
-	board[44] = WHITE;
-	board[45] = BLACK;
-	board[54] = BLACK;
-	board[55] = WHITE;
+	for (i = 90; i <= 99; i++) board[i] = OUTER;
+	board[44] = WHITE; board[45] = BLACK; board[54] = BLACK; board[55] = WHITE;
 }
 
-void free_board()
-{
+void free_board() {
 	free(board);
 }
 
@@ -250,19 +202,17 @@ void free_board()
  *   - run_worker should play minimax from its move(s) 
  *   - results should be send to Rank 0 for final selection of a move 
  */
-void run_worker()
-{
+void run_worker() {
 	int running = 0;
 	// Broadcast colour
 	// Broadcast running
 
-	while (running == 1)
-	{
+	while (running == 1) {
 		// Broadcast board
 
-		// Generate move
+		// Generate move        
 
-		// Broadcast running
+		// Broadcast running 
 	}
 }
 
@@ -274,44 +224,36 @@ void run_worker()
  *  - the ranks may communicate during execution 
  *  - final results should be gathered at rank 0 for final selection of a move 
  */
-void gen_move_master(char *move, int my_colour, FILE *fp)
-{
+void gen_move_master(char *move, int my_colour, FILE *fp) {
 	int loc;
 
 	/* generate move */
-	loc = location_strategy(my_colour, fp);//random_strategy
+	loc = random_strategy(my_colour, fp);
 
-	if (loc == -1)
-	{
+	if (loc == -1) {
 		strncpy(move, "pass\n", MOVEBUFSIZE);
-	}
-	else
-	{
+	} else {
 		/* apply move */
 		get_move_string(loc, move);
 		make_move(loc, my_colour, fp);
 	}
 }
 
-void apply_opp_move(char *move, int my_colour, FILE *fp)
-{
+void apply_opp_move(char *move, int my_colour, FILE *fp) {
 	int loc;
-	if (strcmp(move, "pass\n") == 0)
-	{
+	if (strcmp(move, "pass\n") == 0) {
 		return;
 	}
 	loc = get_loc(move);
 	make_move(loc, opponent(my_colour, fp), fp);
 }
 
-void game_over()
-{
+void game_over() {
 	free_board();
 	MPI_Finalize();
 }
 
-void get_move_string(int loc, char *ms)
-{
+void get_move_string(int loc, char *ms) {
 	int row, col, new_loc;
 	new_loc = loc - (9 + 2 * (loc / 10));
 	row = new_loc / 8;
@@ -322,168 +264,101 @@ void get_move_string(int loc, char *ms)
 	ms[3] = 0;
 }
 
-int get_loc(char *movestring)
-{
+int get_loc(char* movestring) {
 	int row, col;
-	/* movestring of form "xy", x = row and y = column */
-	row = movestring[0] - '0';
-	col = movestring[1] - '0';
+	/* movestring of form "xy", x = row and y = column */ 
+	row = movestring[0] - '0'; 
+	col = movestring[1] - '0'; 
 	return (10 * (row + 1)) + col + 1;
 }
 
-void legal_moves(int player, int *moves, FILE *fp)
-{
+void legal_moves(int player, int *moves, FILE *fp) {
 	int move, i;
 	moves[0] = 0;
 	i = 0;
 	for (move = 11; move <= 88; move++)
-		if (legalp(move, player, fp))
-		{
-			i++;
-			moves[i] = move;
-		}
+		if (legalp(move, player, fp)) {
+		i++;
+		moves[i] = move;
+	}
 	moves[0] = i;
 }
 
-int legalp(int move, int player, FILE *fp)
-{
+int legalp(int move, int player, FILE *fp) {
 	int i;
-	if (!validp(move))
-		return 0;
-	if (board[move] == EMPTY)
-	{
+	if (!validp(move)) return 0;
+	if (board[move] == EMPTY) {
 		i = 0;
-		while (i <= 7 && !would_flip(move, ALLDIRECTIONS[i], player, fp))
-			i++;
-		if (i == 8)
-			return 0;
-		else
-			return 1;
+		while (i <= 7 && !would_flip(move, ALLDIRECTIONS[i], player, fp)) i++;
+		if (i == 8) return 0; else return 1;
 	}
-	else
-		return 0;
+	else return 0;
 }
 
-int validp(int move)
-{
-	if ((move >= 11) && (move <= 88) && (move % 10 >= 1) && (move % 10 <= 8))
+int validp(int move) {
+	if ((move >= 11) && (move <= 88) && (move%10 >= 1) && (move%10 <= 8))
 		return 1;
-	else
-		return 0;
+	else return 0;
 }
 
-int would_flip(int move, int dir, int player, FILE *fp)
-{
+int would_flip(int move, int dir, int player, FILE *fp) {
 	int c;
 	c = move + dir;
 	if (board[c] == opponent(player, fp))
-		return find_bracket_piece(c + dir, dir, player, fp);
-	else
-		return 0;
+		return find_bracket_piece(c+dir, dir, player, fp);
+	else return 0;
 }
 
-int find_bracket_piece(int square, int dir, int player, FILE *fp)
-{
-	while (board[square] == opponent(player, fp))
-		square = square + dir;
-	if (board[square] == player)
-		return square;
-	else
-		return 0;
+int find_bracket_piece(int square, int dir, int player, FILE *fp) {
+	while (board[square] == opponent(player, fp)) square = square + dir;
+	if (board[square] == player) return square;
+	else return 0;
 }
 
-int opponent(int player, FILE *fp)
-{
-	if (player == BLACK)
-		return WHITE;
-	if (player == WHITE)
-		return BLACK;
-	fprintf(fp, "illegal player\n");
-	return EMPTY;
+int opponent(int player, FILE *fp) {
+	if (player == BLACK) return WHITE;
+	if (player == WHITE) return BLACK;
+	fprintf(fp, "illegal player\n"); return EMPTY;
 }
 
-int random_strategy(int my_colour, FILE *fp)
-{
+int random_strategy(int my_colour, FILE *fp) {
 	int r;
-	int *moves = (int *)malloc(LEGALMOVSBUFSIZE * sizeof(int));
+	int *moves = (int *) malloc(LEGALMOVSBUFSIZE * sizeof(int));
 	memset(moves, 0, LEGALMOVSBUFSIZE);
 
 	legal_moves(my_colour, moves, fp);
-	if (moves[0] == 0)
-	{
+	if (moves[0] == 0) {
 		return -1;
 	}
-	srand(time(NULL));
+	srand (time(NULL));
 	r = moves[(rand() % moves[0]) + 1];
 	free(moves);
-	return (r);
+	return(r);
 }
 
-int location_strategy(int my_colour, FILE *fp)
-{
-	int r;
-	int *moves = (int *)malloc(LEGALMOVSBUFSIZE * sizeof(int));
-	memset(moves, 0, LEGALMOVSBUFSIZE);
-
-	legal_moves(my_colour, moves, fp);
-	if (moves[0] == 0)
-	{
-		return -1;
-	}
-	int best_loc;	
-	srand(time(NULL));
-	best_loc=find_highestPos(moves);
-	r = moves[best_loc];//selects random item in moves
-	free(moves);
-	return (r);
-}
-int find_highestPos(int* moves)
-{
-	int x, y;
-	int max=-21;
-	int max_i=0;
-	for(int i = 1; i <= moves[0]; i++) {
-		x = moves[i]/10;
-		y = moves[i]%10;
-		int val = boardWeighted[x-1][y-1];
-		if(val > max){
-			max = val;
-			max_i = i;
-		}
-	}
-	return max_i;
-}
-
-void make_move(int move, int player, FILE *fp)
-{
+void make_move(int move, int player, FILE *fp) {
 	int i;
 	board[move] = player;
-	for (i = 0; i <= 7; i++)
-		make_flips(move, ALLDIRECTIONS[i], player, fp);
+	for (i = 0; i <= 7; i++) make_flips(move, ALLDIRECTIONS[i], player, fp);
 }
 
-void make_flips(int move, int dir, int player, FILE *fp)
-{
+void make_flips(int move, int dir, int player, FILE *fp) {
 	int bracketer, c;
 	bracketer = would_flip(move, dir, player, fp);
-	if (bracketer)
-	{
+	if (bracketer) {
 		c = move + dir;
-		do
-		{
+		do {
 			board[c] = player;
 			c = c + dir;
 		} while (c != bracketer);
 	}
 }
 
-void print_board(FILE *fp)
-{
+void print_board(FILE *fp) {
 	int row, col;
 	fprintf(fp, "   1 2 3 4 5 6 7 8 [%c=%d %c=%d]\n",
-			nameof(BLACK), count(BLACK, board), nameof(WHITE), count(WHITE, board));
-	for (row = 1; row <= 8; row++)
-	{
+		nameof(BLACK), count(BLACK, board), nameof(WHITE), count(WHITE, board));
+	for (row = 1; row <= 8; row++) {
 		fprintf(fp, "%d  ", row);
 		for (col = 1; col <= 8; col++)
 			fprintf(fp, "%c ", nameof(board[col + (10 * row)]));
@@ -492,18 +367,15 @@ void print_board(FILE *fp)
 	fflush(fp);
 }
 
-char nameof(int piece)
-{
+char nameof(int piece) {
 	assert(0 <= piece && piece < 5);
-	return (piecenames[piece]);
+	return(piecenames[piece]);
 }
 
-int count(int player, int *board)
-{
+int count(int player, int * board) {
 	int i, cnt;
 	cnt = 0;
 	for (i = 1; i <= 88; i++)
-		if (board[i] == player)
-			cnt++;
+		if (board[i] == player) cnt++;
 	return cnt;
 }
