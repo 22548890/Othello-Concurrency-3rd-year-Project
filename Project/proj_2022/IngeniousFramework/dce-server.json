@@ -1,0 +1,24 @@
+{
+  /* where do we start the gameserver? */
+  "hostname": "146.232.213.40",
+  "port": 0,
+  /* full java identifier for the referee */
+  "referee": "",
+  /* assigns a name to the referee above */
+  "gameName": "bomberman",
+  /* game specific configuration can be added in this object */
+  "gameConfig": {
+    "LobbyName": "BMTest",
+    "gameName": "bomberman",
+    "numPlayers": 2,
+    "boardSize": 11,
+    "perfectInformation": true,
+    "alternatingPlay": true,
+    "engineNames": [
+      "BM Engine MCTS",
+      "BM Engine MCTS"
+    ],
+    "openSlots": [],
+    "managerPlaying": false
+  }
+}

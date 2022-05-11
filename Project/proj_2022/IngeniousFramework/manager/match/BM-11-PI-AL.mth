@@ -1,0 +1,11 @@
+{
+	"LobbyName": "BMTest",
+	"gameName" : "bomberman",
+	"numPlayers": 2,
+	"boardSize": 11,
+    "perfectInformation": true,
+	"alternatingPlay" : true,
+	"engineNames": ["BM Engine MCTS","BM Engine MCTS"],
+	"openSlots": [],
+	"managerPlaying": false
+}

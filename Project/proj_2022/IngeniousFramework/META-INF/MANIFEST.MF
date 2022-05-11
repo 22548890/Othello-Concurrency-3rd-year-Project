@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Implementation-Title: Ingenious Framework
+Implementation-Version: 0.0.4
+Main-Class: za.ac.sun.cs.ingenious.core.commandline.main.Driver
+

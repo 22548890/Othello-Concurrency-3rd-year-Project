@@ -9,7 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <mpi.h>
-
 #include "logger.h"
 
 #define MAX 100
@@ -71,21 +70,22 @@ void usage(char* prog_name){
 int process_zero(char *input_file) {
 	int *vector_full = NULL;
 	int *vector_local = NULL;
-	int size_full = 0, size_local = 0; 
+	int size_full = 0, size_local = 0;
 	int global_max = 0;
-	int comm_sz;
+
+	int np = 0;
+	int comm_sz = 0;
 
 	/* TODO: get comm_sz: e.g., 2 */ 
-	MPI_Init(NULL,NULL);
-	MPI_Comm_size(MPI_COMM_WORLD, &comm_sz);
+ 	MPI_Comm_size(MPI_COMM_WORLD, &comm_sz);
+
 	/* TODO: allocate memory */
-	vector_full = malloc(sizeof(int)*strlen(input_file));
+    vector_full = malloc(sizeof(int)*strlen(input_file));
+
 	/* TODO: read values from input file and store in vector_full: e.g., 1 2 3 4 5 6 7 8 9 */
-	/* TODO: store the number of values read in size_full: e.g., 9 */
-	FILE *myFile;
-	myFile = fopen(input_file, "r");
-	fscanf(myFile, "%d ", vector_full);
-	
+	read_vector(vector_full, &np , input_file);
+
+	size_full = np;	
 
 	#ifdef DEBUG 
 	print_vector(vector_full, size_full, "Full vector on proc");
@@ -94,18 +94,33 @@ int process_zero(char *input_file) {
 	/* TODO: calculate size_local: size of subvectors, e.g., 9 / 2 = 4 */
 	/* 	- ignore last numbers if they can't be equally divided */
 	/* TODO: broadcast size of subvectors */
+	size_local = (int) size_full/comm_sz;
+	MPI_Bcast(&size_local, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
 	/* TODO: allocate memory */
+	vector_local = malloc(size_local * sizeof(int));
+
 	/* TODO: scatter vector equally among all processes using scatter, e.g., Proc 0 receives 1 2 3 4 */ 
+	MPI_Scatter(vector_full, size_local , MPI_INT ,vector_local, size_local, MPI_INT, 0, MPI_COMM_WORLD);
 
 	#ifdef DEBUG 
 	print_vector(vector_local, size_local, "Subvector on proc");
 	#endif
 
 	/* TODO: find the max value in subvector, e.g., 4 */ 
+	int max = 0;
+	for (int i = 1; i < size_local; ++i) {
+    if ( *(vector_local) <  *(vector_local+i)){
+      *(vector_local) = *(vector_local+i);
+    } 	
+	max = *(vector_local);
+  }
 	/* TODO: find the global max value using the collective Reduce command, e.g., 8 */
-
+	MPI_Reduce(&max, &global_max, 1, MPI_INT, MPI_MAX, 0, MPI_COMM_WORLD);
+ 
 	/* TODO: free memory */
-
+	free(vector_full);
+    free(vector_local);
 	return global_max;
 }
 
@@ -118,21 +133,35 @@ int process_zero(char *input_file) {
 
 void process_i() {
 	int *vector_local = NULL;
+	//int *vector_full = NULL;
+	//int size_full = 1;
 	int size_local = 0;
-
+	
 	/* TODO: receive size of subvector from pro 0 using a broadcast */
+	MPI_Bcast(&size_local, 1, MPI_INT, 0, MPI_COMM_WORLD);
 	/* TODO: allocate memory for subvector and receive subvector from proc 0 using scatter */ 
+	vector_local = (int*) malloc(size_local * sizeof(int));
+	MPI_Scatter(NULL, 1 , MPI_INT ,vector_local, size_local, MPI_INT, 0, MPI_COMM_WORLD);
 
 	#ifdef DEBUG 
 	print_vector(vector_local, size_local, "Subvector on proc");
 	#endif
 
 	/* TODO: find the maximum value in the locally received subvector */
+		int local_max = 0;
+		for (int i = 1; i < size_local; ++i) {
+		if ( *(vector_local) <  *(vector_local+i)){
+		*(vector_local) = *(vector_local+i);
+		} 	
+		local_max = *(vector_local);
+	}
+	int global_max;
 	/* TODO: find the global maximum value using the collective Reduce command */
-
+	MPI_Reduce(&local_max, &global_max, 1, MPI_INT, MPI_MAX, 0, MPI_COMM_WORLD);
+ 
 	/* TODO: free memory */
-
-}
+ 	free(vector_local); 
+  }
 
 /*-------------------------------------------------------------------
  * Function: read_vector
@@ -156,8 +185,6 @@ void read_vector(int *vector, int *n_p, char* input_file) {
 		fprintf(stderr, "Can't open data file");	
 	}
 }
-
-
 /*-------------------------------------------------------------------
  * Function: print_vector
  * Purpose: Print a msg and a vector of integer values

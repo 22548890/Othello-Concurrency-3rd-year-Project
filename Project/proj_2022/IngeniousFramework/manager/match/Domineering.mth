@@ -1,0 +1,16 @@
+{
+	"LobbyName": "Domineering",
+	"gameName":"Dom",
+	"numPlayers": 2,
+	"boardSize": 6,	
+	"engines": [
+		{
+			name: "DomineeringMCTSEngine",
+			className: "za.ac.sun.cs.ingenious.games.domineering.DomineeringMCTSEngine"
+		},
+		{
+			name: "DomineeringRandomEngine",
+			className: "za.ac.sun.cs.ingenious.games.domineering.DomineeringRandomEngine"
+		}
+	]
+}

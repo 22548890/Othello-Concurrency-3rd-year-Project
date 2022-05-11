@@ -1,0 +1,4 @@
+{
+  /* the full java identifier of your engine*/
+  "engineName": "za.ac.sun.cs.ingenious.games.bomberman.engines.BMEngineBFS"
+}
