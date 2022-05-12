@@ -41,16 +41,15 @@
 #include <time.h>
 #include <assert.h>
 #include "comms.h"
-#include<stdarg.h>
-#define FILE_Debug_
-
+#include <stdarg.h>
+#include <unistd.h>
 
 const int EMPTY = 0;
 const int BLACK = 1;
 const int WHITE = 2;
 const int MAX = 1000000000;
 const int MIN = -1000000000;
-const int MAXDEPTH =6;
+const int MAXDEPTH = 6;
 
 const int OUTER = 3;
 const int ALLDIRECTIONS[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
@@ -99,10 +98,6 @@ int evaluateGameTime(int my_colour, FILE *fp);
 void sortMoves(int *moves);
 int get_best_loc(int *buff);
 
-void Debug_(char* debug_string,...);
-void open_files();
-FILE* fDEBUG_;
-
 int send_arrMovesScore[2];
 int size;
 int rank;
@@ -135,26 +130,30 @@ int cornersWeights[8][8] = {{10, 1, 5, 3, 3, 5, 1, 10},
 							{10, 1, 5, 3, 3, 5, 1, 10}};
 
 int *board;
-int *best_val;
+int best_val;
 
 int main(int argc, char *argv[])
 {
 
-	FILE *fp = NULL; //open_files();//debug
+	FILE *fp = NULL;
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
 	initialise_board(); //one for each process
-
+	double time = 0.0;
+	clock_t begin = clock();
 	if (rank == 0)
 	{
 		run_master(argc, argv, fp);
 	}
 	else
 	{
-		
+
 		run_worker(fp);
 	}
+
+	clock_t end = clock();
+	time += (double)(end - begin) / CLOCKS_PER_SEC;
 	game_over();
 }
 
@@ -175,7 +174,7 @@ void run_master(int argc, char *argv[], FILE *fp)
 		my_colour = BLACK;
 	// Broadcast my_colour
 	MPI_Bcast(&my_colour, 1, MPI_INT, 0, MPI_COMM_WORLD);
-	
+
 	while (running == 1)
 	{
 		/* Receive next command from referee */
@@ -201,7 +200,7 @@ void run_master(int argc, char *argv[], FILE *fp)
 		{
 			// Broadcast running
 			MPI_Bcast(&running, 1, MPI_INT, 0, MPI_COMM_WORLD);
-			
+
 			// Broadcast board
 			MPI_Bcast(board, BOARDSIZE, MPI_INT, 0, MPI_COMM_WORLD);
 			gen_move_master(my_move, my_colour, fp);
@@ -292,10 +291,6 @@ void free_board()
 {
 	free(board);
 }
-void free_this_board(int *this_board)
-{
-	free(this_board);
-}
 
 /**
  *   Rank i (i != 0) executes this code 
@@ -308,7 +303,7 @@ void run_worker(FILE *fp)
 {
 	int running = 0;
 	char my_move[MOVEBUFSIZE];
-	int *buff;
+	// int *buff=(int *)malloc(size * 2 * sizeof(int));;
 	// Broadcast colour
 	int my_colour;
 	MPI_Bcast(&my_colour, 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -348,11 +343,11 @@ void gen_move_master(char *move, int my_colour, FILE *fp)
 	int *buff = (int *)malloc(size * 2 * sizeof(int));
 	/* generate move */
 	// loc = location_strategy(my_colour, fp); //random_strategy
-	 best_val=MIN;
+	best_val = MIN;
 	//dlegate legal moves to all proccesses
-	
+
 	loc = minimax_strategy(my_colour, fp);
-	
+
 	send_arrMovesScore[0] = loc;
 	send_arrMovesScore[1] = best_val;
 
@@ -360,7 +355,7 @@ void gen_move_master(char *move, int my_colour, FILE *fp)
 	{
 		MPI_Gather(send_arrMovesScore, 2, MPI_INT, buff, 2, MPI_INT, 0, MPI_COMM_WORLD); //gathers move and score
 		loc = get_best_loc(buff);
-		// Debug_("best loc %d", loc);														 //get best loc
+		// Debug("best loc %d", loc);														 //get best loc
 		free(buff);
 
 		if (loc == -1)
@@ -447,7 +442,7 @@ void legal_moves(int player, int *moves, FILE *fp)
 		}
 	}
 	moves[0] = i;
-	//sortMoves(moves);
+	// sortMoves(moves);
 }
 
 int legalp(int move, int player, FILE *fp)
@@ -581,7 +576,7 @@ void sortMoves(int *moves) //based on stability
 	{
 		x = moves[i] / 10;
 		y = moves[i] % 10;
-		int val = (stabilityWeights2[x - 1][y - 1]) + (cornersWeights[x - 1][y - 1] / 3);
+		int val = (stabilityWeights2[x - 1][y - 1]);
 		movesValues[i] = val;
 	} //add move values to array
 
@@ -607,50 +602,56 @@ void rank_legal_moves(int my_colour, int *rank_moves, FILE *fp)
 	int *moves = (int *)malloc(LEGALMOVSBUFSIZE * sizeof(int));
 	memset(moves, 0, LEGALMOVSBUFSIZE);
 	legal_moves(my_colour, moves, fp);
-	int counter=0;
-	if (moves[0]!=0){
-		for (int i=rank+1;i<=moves[0];i+=size){
+	int counter = 0;
+	if (moves[0] != 0)
+	{
+		for (int i = rank + 1; i <= moves[0]; i += size)
+		{
 			counter++;
-			rank_moves[counter]=moves[i];//assigning a move to rank_moves for each rank
+			rank_moves[counter] = moves[i]; //assigning a move to rank_moves for each rank
 		}
-		rank_moves[0]=counter;//length of moves for rank_moves
-		if (moves[0]<size) { //excess ranks
-			for (int r=size-1;r>=moves[0];r--){
-				if (rank==r){
-					rank_moves[0]=-1;//excess ranks dont need moves
+		rank_moves[0] = counter; //length of moves for rank_moves
+		if (moves[0] < size)
+		{ //excess ranks
+			for (int r = size - 1; r >= moves[0]; r--)
+			{
+				if (rank == r)
+				{
+					rank_moves[0] = -1; //excess ranks dont need moves
 				}
 			}
 		}
 	}
-	// Debug_("rank move %d for rank %d", rank_moves[0], rank);
+
+	// Debug("rank move %d for rank %d", rank_moves[0], rank);
 	free(moves);
 }
 
 int minimax_strategy(int my_colour, FILE *fp)
 {
 	int i, loc, best_score, best_move = 0, score;
-	int *moves = (int *)malloc(LEGALMOVSBUFSIZE/size * sizeof(int));
+	int *moves = (int *)malloc(LEGALMOVSBUFSIZE / size * sizeof(int));
 	memset(moves, 0, LEGALMOVSBUFSIZE);
 	int *original_board = (int *)malloc(BOARDSIZE * sizeof(int));
 	// duplicateBoard(board, original_board); //copied original state of board
 	memcpy(original_board, board, BOARDSIZE * sizeof(int));
 	//get moves from get proc legal moves instead of legal moves
-	rank_legal_moves(my_colour,moves,fp);
-	// legal_moves(my_colour, moves, fp);
-	// Debug_("move %d for rank %d", moves[0], rank);
-	if (moves[0] == 0)
+	rank_legal_moves(my_colour, moves, fp);
+	//legal_moves(my_colour, moves, fp);
+	// Debug("move %d for rank %d", moves[0], rank);
+	if (moves[0] <= 0)
 	{
 		return -1; //no moves
 	}
 	else
 	{
-		best_score = MIN;
+		best_score = MIN; //sortMoves(moves);
 		for (i = 1; i <= moves[0]; i++)
 		{
 			// duplicateBoard(original_board, board);
-			memcpy(board,original_board, BOARDSIZE * sizeof(int));
+			memcpy(board, original_board, BOARDSIZE * sizeof(int));
 			loc = moves[i];
-			//Debug_("move %d for rank %d loc %d", moves[0], rank, loc);
+			//Debug("move %d for rank %d loc %d", moves[0], rank, loc);
 			make_move(loc, my_colour, fp);
 			score = minimax_score(1, 1, opponent(my_colour, fp), fp, MIN, MAX);
 			if (score > best_score)
@@ -662,11 +663,10 @@ int minimax_strategy(int my_colour, FILE *fp)
 		}
 		// fprintf(fp, "bestie score=%d at %d\n", best_score, best_move);
 		//duplicateBoard(original_board, board); //reset board to original_board before move
-		memcpy(board,original_board, BOARDSIZE * sizeof(int));
+		memcpy(board, original_board, BOARDSIZE * sizeof(int));
 		free(moves);
-		free_this_board(original_board);
-		best_val = best_score; 
-		// Debug_("rank %d loc %d best_score %d", rank, best_move, best_score);
+		free(original_board);
+		best_val = best_score;
 		return best_move;
 	}
 }
@@ -677,34 +677,35 @@ int minimax_score(int depth, int bMaxMin, int my_colour, FILE *fp, int alpha, in
 	memset(moves, 0, LEGALMOVSBUFSIZE);
 	int *original_board = (int *)malloc(BOARDSIZE * sizeof(int));
 	//duplicateBoard(board, original_board); //copied original state of board
-	memcpy(original_board,board, BOARDSIZE * sizeof(int));
+	memcpy(original_board, board, BOARDSIZE * sizeof(int));
 	int best;
 
 	if (depth == MAXDEPTH)
 	{
 		//duplicateBoard(original_board, board); //reset board to original_board before move
-		memcpy(board,original_board, BOARDSIZE * sizeof(int));
+		memcpy(board, original_board, BOARDSIZE * sizeof(int));
 		free(moves);
-		free_this_board(original_board);
-		if (bMaxMin == 0)
-		{
-			return evaluatePosition(my_colour, fp); //colour for max?
-		}
-		return evaluatePosition(opponent(my_colour, fp), fp); //colour for max?
+		free(original_board);
+		// if (bMaxMin == 0)
+		// {
+		return evaluatePosition(my_colour, fp); //colour for max?
+												// }
+												// return evaluatePosition(opponent(my_colour, fp), fp); //colour for max?
 	}
 	legal_moves(my_colour, moves, fp); //all possible moves
-	if (moves[0] == 0)
+	if (moves[0] <= 0)
 	{
 		return -1; //no moves
 	}
-
+	//
 	if (bMaxMin == 0)
 	{
 		best = MIN;
+		sortMoves(moves);
 		for (i = 1; i <= moves[0]; i++)
 		{
 			//duplicateBoard(original_board, board);
-			memcpy(board,original_board, BOARDSIZE * sizeof(int));
+			memcpy(board, original_board, BOARDSIZE * sizeof(int));
 			make_move(moves[i], my_colour, fp);
 			int score = minimax_score(depth + 1, 1, opponent(my_colour, fp), fp, alpha, beta);
 			best = max(best, score);
@@ -716,18 +717,19 @@ int minimax_score(int depth, int bMaxMin, int my_colour, FILE *fp, int alpha, in
 			}
 		}
 		//duplicateBoard(original_board, board); //reset board to original_board before move
-		memcpy(board,original_board, BOARDSIZE * sizeof(int));
+		memcpy(board, original_board, BOARDSIZE * sizeof(int));
 		free(moves);
-		free_this_board(original_board);
+		free(original_board);
 		//return best;
 	}
 	else
 	{
 		best = MAX;
+		sortMoves(moves);
 		for (i = 1; i <= moves[0]; i++)
 		{
 			//duplicateBoard(original_board, board);
-			memcpy(board,original_board, BOARDSIZE * sizeof(int));
+			memcpy(board, original_board, BOARDSIZE * sizeof(int));
 			make_move(moves[i], my_colour, fp);
 			int score = minimax_score(depth + 1, 0, opponent(my_colour, fp), fp, alpha, beta);
 			best = min(best, score);
@@ -739,9 +741,9 @@ int minimax_score(int depth, int bMaxMin, int my_colour, FILE *fp, int alpha, in
 			}
 		}
 		//duplicateBoard(original_board, board); //reset board to original_board before move
-		memcpy(board,original_board, BOARDSIZE * sizeof(int));
+		memcpy(board, original_board, BOARDSIZE * sizeof(int));
 		free(moves);
-		free_this_board(original_board);
+		free(original_board);
 		//return best;
 	}
 	return best;
@@ -773,20 +775,20 @@ int evaluatePosition(int my_colour, FILE *fp)
 
 	// if (gameTime == 0)
 	// {
-	// 	return (stabilityScore * 0.56) + (mobilityScore * 3*2) + (discDifference * 0.92) + (cornerEdgeScore * 1.2 );
+	// 	return (stabilityScore * 0.56 * 5) + (mobilityScore * 3 * 5) + (discDifference * 0.92) + (cornerEdgeScore * 1.2);
 	// }
 	// else if (gameTime == 1)
 	// {
-	// 	return (stabilityScore * 0.56*2) + (mobilityScore * 3 ) + (discDifference * 0.92*2) + (cornerEdgeScore * 1.2 *4);
+	// 	return (stabilityScore * 0.56 * 2) + (mobilityScore * 3) + (discDifference * 0.92 * 2) + (cornerEdgeScore * 1.2 * 4);
 	// }
 	// else
 	// {
-	// 	return (stabilityScore * 0.56) + (mobilityScore * 3 ) + (discDifference * 0.92*2) + (cornerEdgeScore * 1.2 );
+	// 	return (stabilityScore * 0.56) + (mobilityScore * 3) + (discDifference * 0.92 * 5) + (cornerEdgeScore * 1.2);
 	// }
 	//return 2 * mobilityScore + discDifference;
-	// return (stabilityScore * 0.56) + (mobilityScore * 3) + (discDifference * 0.92 * 2) + (cornerEdgeScore * 1.2); //best
-	return cornerEdgeScore;
-																												  //  return (stabilityScore * 0.3) + (mobilityScore * 0.3) + (discDifference * 0.05) + (cornerEdgeScore * 0.35);
+	//  return (stabilityScore * 0.56) + (mobilityScore * 3) + (discDifference * 0.92 * 2) + (cornerEdgeScore * 1.2); //best
+	 return  (stabilityScore * 25*(3-gameTime)) + (mobilityScore *5* (3-gameTime)) + (discDifference *25*gameTime) + (cornerEdgeScore *35*gameTime);
+	//  return (stabilityScore * 0.3) + (mobilityScore * 0.3) + (discDifference * 0.05) + (cornerEdgeScore * 0.35);
 }
 
 int evaluateMobility(int my_colour, FILE *fp)
@@ -959,23 +961,4 @@ int count(int player, int *board)
 		if (board[i] == player)
 			cnt++;
 	return cnt;
-}
-
-void Debug_(char* debug_string,...){
-	#ifdef FILE_Debug_
-		fDEBUG_= fopen("Debug_file.txt","a");
-		va_list args;
-		va_start(args,debug_string);
-		vfprintf( fDEBUG_, debug_string, args );
-		fprintf(fDEBUG_, "\n");
-		va_end(args);
-		fclose(fDEBUG_);
-	#endif
-}
-
-void open_files(){
-	#ifdef FILE_Debug_
-		fDEBUG_ = fopen("Debug_file.txt","w");
-		fclose(fDEBUG_);
-	#endif
 }

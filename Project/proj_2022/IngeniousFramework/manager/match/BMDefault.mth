@@ -1,6 +1,0 @@
-{
-	"numPlayers": 2,
-	"boardSize": 11,
-    "perfectInformation": true,
-	"alternatingPlay" : true
-}
