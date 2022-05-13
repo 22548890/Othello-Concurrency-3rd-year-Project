@@ -49,7 +49,7 @@ const int BLACK = 1;
 const int WHITE = 2;
 const int MAX = 1000000000;
 const int MIN = -1000000000;
-const int MAXDEPTH = 6;
+const int MAXDEPTH = 8;
 
 const int OUTER = 3;
 const int ALLDIRECTIONS[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
@@ -95,6 +95,7 @@ void duplicateBoard(int *board, int *cBoard);
 int evaluateStability(int my_colour, FILE *fp);
 int evaluateCorners(int my_colour, FILE *fp);
 int evaluateGameTime(int my_colour, FILE *fp);
+int evaluateCorner(int my_colour, FILE *fp);
 void sortMoves(int *moves);
 int get_best_loc(int *buff);
 
@@ -767,12 +768,26 @@ int min(int num1, int num2)
 
 int evaluatePosition(int my_colour, FILE *fp)
 {
-	int mobilityScore = evaluateMobility(my_colour, fp);
-	int discDifference = evaluateDiscDifference(my_colour, fp);
-	int stabilityScore = evaluateStability(my_colour, fp);
-	int cornerEdgeScore = evaluateCorners(my_colour, fp);
-	int gameTime = evaluateGameTime(my_colour, fp);
+	//int mobilityScore = evaluateMobility(my_colour, fp);
+	//int discDifference = evaluateDiscDifference(my_colour, fp);
+	//int stabilityScore = evaluateStability(my_colour, fp);
+	//int cornerEdgeScore = evaluateCorners(my_colour, fp);
+	// int gameTime = evaluateGameTime(my_colour, fp);
 
+	// switch (gameTime)
+	// {
+	// case 0://1/3
+	// 	return evaluateMobility(my_colour, fp) + evaluateStability(my_colour, fp);
+	// 	break;
+	// case 1://2/3
+	// 	return evaluateCorners(my_colour, fp)+ evaluateStability(my_colour, fp);;
+	// 	break;
+	// case 2://3/3
+	// 	return evaluateDiscDifference(my_colour,fp) + evaluateCorners(my_colour, fp);
+	// 	break;
+	// }
+	return evaluateCorner(my_colour, NULL);
+	//return mobilityScore + cornerEdgeScore;
 	// if (gameTime == 0)
 	// {
 	// 	return (stabilityScore * 0.56 * 5) + (mobilityScore * 3 * 5) + (discDifference * 0.92) + (cornerEdgeScore * 1.2);
@@ -787,7 +802,7 @@ int evaluatePosition(int my_colour, FILE *fp)
 	// }
 	//return 2 * mobilityScore + discDifference;
 	//  return (stabilityScore * 0.56) + (mobilityScore * 3) + (discDifference * 0.92 * 2) + (cornerEdgeScore * 1.2); //best
-	 return  (stabilityScore * 25*(3-gameTime)) + (mobilityScore *5* (3-gameTime)) + (discDifference *25*gameTime) + (cornerEdgeScore *35*gameTime);
+	//return  (stabilityScore * 25*(3-gameTime)) + (mobilityScore *5* (3-gameTime)) + (discDifference *25*gameTime) + (cornerEdgeScore *35*gameTime);//thanos
 	//  return (stabilityScore * 0.3) + (mobilityScore * 0.3) + (discDifference * 0.05) + (cornerEdgeScore * 0.35);
 }
 
@@ -854,6 +869,50 @@ int evaluateCorners(int my_colour, FILE *fp)
 	return 100 * (playerScore - opponentScore) / (playerScore + opponentScore);
 }
 
+int evaluateCorner(int my_colour, FILE *fp)
+{
+	int score=0;
+	int x;
+	int y;
+	int val;
+	for (int i = 11; i <= 88; i++)
+	{
+		if (board[i] != EMPTY)
+		{
+			x = i / 10;
+			y = i % 10;
+			val = stabilityWeights2[x - 1][y - 1];
+			if (board[i] == my_colour)
+				score += val;
+			else
+				score -= val;
+
+			switch (i)
+			{
+			case 11:
+				if (board[i] != my_colour)
+					score -= 10;
+				break;
+			case 18:
+				if (board[i] != my_colour)
+					score -= 10;
+				break;
+			case 81:
+				if (board[i] != my_colour)
+					score -= 10;
+				break;
+			case 88:
+				if (board[i] != my_colour)
+					score -= 10;
+				break;
+
+			default:
+				break;
+			}
+		}
+	}
+	return score;
+}
 int evaluateDiscDifference(int my_colour, FILE *fp)
 {
 	int playerScore = 0, opponentScore = 0;
