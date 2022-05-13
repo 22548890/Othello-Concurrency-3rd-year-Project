@@ -3,5 +3,5 @@
 	"threads": 4,
 	"time": 4,
 	"path2": "player/my_player",
-	"path1": "player/spiderman"
+	"path1": "player/my_player"
 }
