@@ -775,20 +775,33 @@ int evaluatePosition(int my_colour, FILE *fp)
 	//int cornerEdgeScore = evaluateCorners(my_colour, fp);
 	int gameTime = evaluateGameTime(my_colour, fp);
 
-	switch (gameTime) //
+	switch (gameTime) //batman
 	{
 	case 0: //1/3
-		return evaluateMobility(my_colour, fp) + evaluateCorners(my_colour, NULL);
+		return evaluateMobility(my_colour, fp) + evaluateCorners(my_colour, NULL) + 100*evaluateCorner(my_colour,NULL);
 		break;
 	case 1: //2/3
-		return evaluateCorner(my_colour, NULL);
+		return 100*evaluateCorner(my_colour, NULL)+evaluateMobility(my_colour, fp);
 		break;
 	case 2: //3/3
-		return all_in_one(my_colour);
+		return all_in_one(my_colour)+ evaluateDiscDifference(my_colour, NULL);
 		break;
 	}
 
-	// switch (gameTime) //beats thanos not ironman
+	// switch (gameTime) //batman
+	// {
+	// case 0: //1/3
+	// 	return evaluateMobility(my_colour, fp) + evaluateCorners(my_colour, NULL) + 100*evaluateCorner(my_colour,NULL);
+	// 	break;
+	// case 1: //2/3
+	// 	return 100*evaluateCorner(my_colour, NULL)+evaluateMobility(my_colour, fp);
+	// 	break;
+	// case 2: //3/3
+	// 	return all_in_one(my_colour)+ evaluateDiscDifference(my_colour, NULL);
+	// 	break;
+	// }
+
+	// switch (gameTime) //beats thanos not ironman balckpanther
 	// {
 	// case 0: //1/3
 	// 	return 2 * evaluateMobility(my_colour, fp) + evaluateCorner(my_colour, NULL);
