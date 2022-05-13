@@ -1,1 +1,0 @@
-Initialise communication and get player colour 

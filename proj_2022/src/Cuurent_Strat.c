@@ -96,6 +96,7 @@ int evaluateStability(int my_colour, FILE *fp);
 int evaluateCorners(int my_colour, FILE *fp);
 int evaluateGameTime(int my_colour, FILE *fp);
 int evaluateCorner(int my_colour, FILE *fp);
+int all_in_one(int my_colour);
 void sortMoves(int *moves);
 int get_best_loc(int *buff);
 
@@ -113,13 +114,13 @@ int boardWeighted[8][8] = {{100, -10, 11, 6, 6, 11, -10, 100},
 						   {100, -10, 11, 6, 6, 11, -10, 100}};
 
 int stabilityWeights2[8][8] = {{4, -3, 3, 2, 2, 3, -3, 4},
-							   {-3, -4, -1, -1, -1, -1, -4, -3},
-							   {3, -1, 1, 0, 0, 1, -1, 3},
-							   {2, -1, 0, 1, 1, 0, -1, 2},
-							   {2, -1, 0, 1, 1, 0, -1, 2},
-							   {3, -1, 1, 0, 0, 1, -1, 3},
-							   {-3, -4, -1, -1, -1, -1, -4, -3},
-							   {4, -3, 3, 2, 2, 3, -3, 4}};
+				   {-3, -4, -1, -1, -1, -1, -4, -3},
+				   {3, -1, 1, 0, 0, 1, -1, 3},
+				   {2, -1, 0, 1, 1, 0, -1, 2},
+				   {2, -1, 0, 1, 1, 0, -1, 2},
+				   {3, -1, 1, 0, 0, 1, -1, 3},
+				   {-3, -4, -1, -1, -1, -1, -4, -3},
+				   {4, -3, 3, 2, 2, 3, -3, 4}};
 
 int cornersWeights[8][8] = {{10, 1, 5, 3, 3, 5, 1, 10},
 							{1, 0, 2, 2, 2, 2, 0, 1},
@@ -774,7 +775,7 @@ int evaluatePosition(int my_colour, FILE *fp)
 	//int cornerEdgeScore = evaluateCorners(my_colour, fp);
 	// int gameTime = evaluateGameTime(my_colour, fp);
 
-	// switch (gameTime)
+	// switch (gameTime)//ironman
 	// {
 	// case 0://1/3
 	// 	return evaluateMobility(my_colour, fp) + evaluateStability(my_colour, fp);
@@ -786,7 +787,9 @@ int evaluatePosition(int my_colour, FILE *fp)
 	// 	return evaluateDiscDifference(my_colour,fp) + evaluateCorners(my_colour, fp);
 	// 	break;
 	// }
-	return evaluateCorner(my_colour, NULL);
+	//return evaluateCorner(my_colour, NULL);//spider man
+	return all_in_one(my_colour);
+
 	//return mobilityScore + cornerEdgeScore;
 	// if (gameTime == 0)
 	// {
@@ -868,10 +871,171 @@ int evaluateCorners(int my_colour, FILE *fp)
 	}
 	return 100 * (playerScore - opponentScore) / (playerScore + opponentScore);
 }
+int all_in_one(int my_colour)
+{
+	int my_color = my_colour, opp_color = opponent(my_colour, NULL);
+	int my_tiles = 0, opp_tiles = 0, j, k, my_front_tiles = 0, opp_front_tiles = 0, x, y;
+	double p = 0, c = 0, l = 0, m = 0, f = 0, d = 0;
+
+	int X1[] = {-1, -1, 0, 1, 1, 1, 0, -1};
+	int Y1[] = {0, 1, 1, 1, 0, -1, -1, -1};
+
+	// Piece difference, frontier disks and disk squares
+	for (int i = 11; i <= 88; i++)
+	{
+		x = (i / 10) - 1;
+		y = (i % 10) - 1;
+		if (board[i] == my_color)
+		{
+			d += stabilityWeights2[x][y];
+			my_tiles++;
+		}
+		else if (board[i] == opp_color)
+		{
+			d -= stabilityWeights2[x][y];
+			opp_tiles++;
+		}
+		if (board[i] != EMPTY)
+		{
+			for (k = 0; k < 8; k++)
+			{
+				x = i + X1[k];
+				y = j + Y1[k];
+				if (x >= 0 && x < 8 && y >= 0 && y < 8 && board[i] == EMPTY)
+				{
+					if (board[i] == my_color)
+						my_front_tiles++;
+					else
+						opp_front_tiles++;
+					break;
+				}
+			}
+		}
+	}
+
+	if (my_tiles > opp_tiles)
+		p = (100.0 * my_tiles) / (my_tiles + opp_tiles);
+	else if (my_tiles < opp_tiles)
+		p = -(100.0 * opp_tiles) / (my_tiles + opp_tiles);
+	else
+		p = 0;
+
+	if (my_front_tiles > opp_front_tiles)
+		f = -(100.0 * my_front_tiles) / (my_front_tiles + opp_front_tiles);
+	else if (my_front_tiles < opp_front_tiles)
+		f = (100.0 * opp_front_tiles) / (my_front_tiles + opp_front_tiles);
+	else
+		f = 0;
+
+	// Corner occupancy
+	my_tiles = opp_tiles = 0;
+	if (board[11] == my_color)
+		my_tiles++;
+	else if (board[11] == opp_color)
+		opp_tiles++;
+	if (board[18] == my_color)
+		my_tiles++;
+	else if (board[18] == opp_color)
+		opp_tiles++;
+	if (board[81] == my_color)
+		my_tiles++;
+	else if (board[81] == opp_color)
+		opp_tiles++;
+	if (board[88] == my_color)
+		my_tiles++;
+	else if (board[88] == opp_color)
+		opp_tiles++;
+	c = 25 * (my_tiles - opp_tiles);
+
+	// Corner closeness
+	my_tiles = opp_tiles = 0;
+	if (board[11] == EMPTY)
+	{
+		if (board[12] == my_color)
+			my_tiles++;
+		else if (board[12] == opp_color)
+			opp_tiles++;
+		if (board[22] == my_color)
+			my_tiles++;
+		else if (board[22] == opp_color)
+			opp_tiles++;
+		if (board[21] == my_color)
+			my_tiles++;
+		else if (board[21] == opp_color)
+			opp_tiles++;
+	}
+	if (board[18] == EMPTY)
+	{
+		if (board[17] == my_color)
+			my_tiles++;
+		else if (board[17] == opp_color)
+			opp_tiles++;
+		if (board[27] == my_color)
+			my_tiles++;
+		else if (board[27] == opp_color)
+			opp_tiles++;
+		if (board[28] == my_color)
+			my_tiles++;
+		else if (board[28] == opp_color)
+			opp_tiles++;
+	}
+	if (board[81] == EMPTY)
+	{
+		if (board[82] == my_color)
+			my_tiles++;
+		else if (board[82] == opp_color)
+			opp_tiles++;
+		if (board[72] == my_color)
+			my_tiles++;
+		else if (board[72] == opp_color)
+			opp_tiles++;
+		if (board[71] == my_color)
+			my_tiles++;
+		else if (board[71] == opp_color)
+			opp_tiles++;
+	}
+	if (board[88] == EMPTY)
+	{
+		if (board[78] == my_color)
+			my_tiles++;
+		else if (board[78] == opp_color)
+			opp_tiles++;
+		if (board[77] == my_color)
+			my_tiles++;
+		else if (board[77] == opp_color)
+			opp_tiles++;
+		if (board[87] == my_color)
+			my_tiles++;
+		else if (board[87] == opp_color)
+			opp_tiles++;
+	}
+	l = -12.5 * (my_tiles - opp_tiles);
+
+	// Mobility
+
+	int *playerMoves = (int *)malloc(LEGALMOVSBUFSIZE * sizeof(int));
+	int *opponentMoves = (int *)malloc(LEGALMOVSBUFSIZE * sizeof(int));
+
+	legal_moves(my_colour, playerMoves, NULL);
+	legal_moves(opp_color, opponentMoves, NULL);
+
+	my_tiles = playerMoves[0];
+	opp_tiles = opponentMoves[0];
+	if (my_tiles > opp_tiles)
+		m = (100.0 * my_tiles) / (my_tiles + opp_tiles);
+	else if (my_tiles < opp_tiles)
+		m = -(100.0 * opp_tiles) / (my_tiles + opp_tiles);
+	else
+		m = 0;
+
+	// final weighted score
+	double score = (10 * p) + (801.724 * c) + (382.026 * l) + (78.922 * m) + (74.396 * f) + (10 * d);
+	return (int)score;
+}
 
 int evaluateCorner(int my_colour, FILE *fp)
 {
-	int score=0;
+	int score = 0;
 	int x;
 	int y;
 	int val;
