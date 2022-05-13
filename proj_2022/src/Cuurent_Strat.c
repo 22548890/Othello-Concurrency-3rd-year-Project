@@ -773,7 +773,7 @@ int evaluatePosition(int my_colour, FILE *fp)
 	//int discDifference = evaluateDiscDifference(my_colour, fp);
 	//int stabilityScore = evaluateStability(my_colour, fp);
 	//int cornerEdgeScore = evaluateCorners(my_colour, fp);
-	// int gameTime = evaluateGameTime(my_colour, fp);
+	 int gameTime = evaluateGameTime(my_colour, fp);
 
 	switch (gameTime)//ironman
 	{
