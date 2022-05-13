@@ -814,24 +814,22 @@ int evaluatePosition(int my_colour, FILE *fp)
 	//return all_in_one(my_colour, 50*gameTime, 100*gameTime, 400-(100*gameTime), 150, 100-(10*gameTime), 100-(20*gameTime));
 	//return all_in_one(my_colour, 10*gameTime, 300*gameTime, 400-(100*gameTime), 150-(30*gameTime), 100-(10*gameTime), 100-(30*gameTime));//dynamic
 
-	
 	//return all_in_one(my_colour, 10, 800, 400, 80, 80, 10);
 	
-
-	// switch (gameTime) //batman
-	// {
-	// case 0: //1/3
-	// 	return evaluateMobility(my_colour, fp) + evaluateCorners(my_colour, NULL) + 100*evaluateCorner(my_colour,NULL);
-	// 	break;
-	// case 1: //2/3
-	// 	return 100*evaluateCorner(my_colour, NULL)+evaluateMobility(my_colour, fp);
-	// 	break;
-	// case 2: //3/3
-	// 	return all_in_one(my_colour, 10, 800, 400, 80, 80, 10);
-	// 	break;
-	// default:
-	// 	return all_in_one(my_colour, 10, 800, 400, 80, 80, 10);
-	// }
+	switch (evaluateGameTime(my_colour, fp)) //batman
+	{
+	case 0: //1/3
+		return evaluateMobility(my_colour, fp) + evaluateCorners(my_colour, NULL) + 100*evaluateCorner(my_colour,NULL);
+		break;
+	case 1: //2/3
+		return 100*evaluateCorner(my_colour, NULL)+evaluateMobility(my_colour, fp);
+		break;
+	case 2: //3/3
+		return all_in_one(my_colour, 10, 800, 400, 80, 80, 10);
+		break;
+	default:
+		return evaluateCorner(my_colour, NULL);
+	}
 
 	// switch (gameTime) //beats thanos not ironman balckpanther
 	// {
