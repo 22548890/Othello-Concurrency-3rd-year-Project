@@ -2,6 +2,6 @@
 	"numPlayers": 2,
 	"threads": 4,
 	"time": 4,
-	"path2": "player/ironman",
-	"path1": "player/my_player"
+	"path1": "player/ironman",
+	"path2": "player/my_player"
 }

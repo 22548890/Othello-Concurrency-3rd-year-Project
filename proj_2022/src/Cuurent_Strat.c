@@ -778,13 +778,13 @@ int evaluatePosition(int my_colour, FILE *fp)
 	switch (gameTime)//ironman
 	{
 	case 0://1/3
-		return evaluateMobility(my_colour, fp) + evaluateStability(my_colour, fp);
+		return 2*evaluateMobility(my_colour, fp) + evaluateStability(my_colour, fp);
 		break;
 	case 1://2/3
 		return evaluateCorners(my_colour, fp)+ evaluateStability(my_colour, fp);;
 		break;
 	case 2://3/3
-		return evaluateDiscDifference(my_colour,fp) + evaluateCorners(my_colour, fp);
+		return all_in_one(my_colour);
 		break;
 	}
 	//return evaluateCorner(my_colour, NULL);//spider man
