@@ -114,13 +114,13 @@ int boardWeighted[8][8] = {{100, -10, 11, 6, 6, 11, -10, 100},
 						   {100, -10, 11, 6, 6, 11, -10, 100}};
 
 int stabilityWeights2[8][8] = {{4, -3, 3, 2, 2, 3, -3, 4},
-				   {-3, -4, -1, -1, -1, -1, -4, -3},
-				   {3, -1, 1, 0, 0, 1, -1, 3},
-				   {2, -1, 0, 1, 1, 0, -1, 2},
-				   {2, -1, 0, 1, 1, 0, -1, 2},
-				   {3, -1, 1, 0, 0, 1, -1, 3},
-				   {-3, -4, -1, -1, -1, -1, -4, -3},
-				   {4, -3, 3, 2, 2, 3, -3, 4}};
+							   {-3, -4, -1, -1, -1, -1, -4, -3},
+							   {3, -1, 1, 0, 0, 1, -1, 3},
+							   {2, -1, 0, 1, 1, 0, -1, 2},
+							   {2, -1, 0, 1, 1, 0, -1, 2},
+							   {3, -1, 1, 0, 0, 1, -1, 3},
+							   {-3, -4, -1, -1, -1, -1, -4, -3},
+							   {4, -3, 3, 2, 2, 3, -3, 4}};
 
 int cornersWeights[8][8] = {{10, 1, 5, 3, 3, 5, 1, 10},
 							{1, 0, 2, 2, 2, 2, 0, 1},
@@ -773,21 +773,33 @@ int evaluatePosition(int my_colour, FILE *fp)
 	//int discDifference = evaluateDiscDifference(my_colour, fp);
 	//int stabilityScore = evaluateStability(my_colour, fp);
 	//int cornerEdgeScore = evaluateCorners(my_colour, fp);
-	 int gameTime = evaluateGameTime(my_colour, fp);
+	int gameTime = evaluateGameTime(my_colour, fp);
 
-	switch (gameTime)//superman
+	switch (gameTime) //
 	{
-	case 0://1/3
-		return all_in_one(my_colour) + evaluateMobility(my_colour,NULL);
+	case 0: //1/3
+		return evaluateMobility(my_colour, fp) + evaluateCorners(my_colour, NULL);
 		break;
-	case 1://2/3
+	case 1: //2/3
+		return evaluateCorner(my_colour, NULL);
+		break;
+	case 2: //3/3
 		return all_in_one(my_colour);
-		break;
-	case 2://3/3
-		return evaluateCorner(my_colour,NULL);
 		break;
 	}
 
+	// switch (gameTime) //beats thanos not ironman
+	// {
+	// case 0: //1/3
+	// 	return 2 * evaluateMobility(my_colour, fp) + evaluateCorner(my_colour, NULL);
+	// 	break;
+	// case 1: //2/3
+	// 	return evaluateCorner(my_colour, fp);
+	// 	break;
+	// case 2: //3/3
+	// 	return all_in_one(my_colour) + evaluateDiscDifference(my_colour, NULL);
+	// 	break;
+	// }
 	// switch (gameTime)//thanos2.0
 	// {
 	// case 0://1/3
