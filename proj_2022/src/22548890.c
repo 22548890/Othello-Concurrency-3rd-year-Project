@@ -32,6 +32,12 @@
  *        In a multiprocessor version 
  *        	- each process should write debug info to its own file 
  *H***********************************************************************/
+/**Sources I made use of:
+ * http://ceur-ws.org/Vol-1107/paper2.pdf
+ * https://courses.cs.washington.edu/courses/cse573/04au/Project/mini1/RUSSIA/Final_Paper.pdf
+ * https://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-4-alpha-beta-pruning/?ref=lbp
+ * https://www.javatpoint.com/mini-max-algorithm-in-ai
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,7 +55,7 @@ const int BLACK = 1;
 const int WHITE = 2;
 const int MAX = 1000000000;
 const int MIN = -1000000000;
-const int MAXDEPTH =6;
+const int MAXDEPTH = 8;
 
 const int OUTER = 3;
 const int ALLDIRECTIONS[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
@@ -96,22 +102,13 @@ int evaluateStability(int my_colour, FILE *fp);
 int evaluateCorners(int my_colour, FILE *fp);
 int evaluateGameTime(int my_colour, FILE *fp);
 int evaluateCorner(int my_colour, FILE *fp);
-int all_in_one(int my_colour);
+int all_in_one(int my_colour, int d, int c, int s, int m, int e, int w);
 void sortMoves(int *moves);
 int get_best_loc(int *buff);
 
 int send_arrMovesScore[2];
 int size;
 int rank;
-
-int boardWeighted[8][8] = {{100, -10, 11, 6, 6, 11, -10, 100},
-						   {-10, -20, 1, 2, 2, 1, -20, -10},
-						   {10, 1, 5, 4, 4, 5, 1, 10},
-						   {6, 2, 4, 2, 2, 4, 2, 6},
-						   {6, 2, 4, 2, 2, 4, 2, 6},
-						   {10, 1, 5, 4, 4, 5, 1, 10},
-						   {-10, -20, 1, 2, 2, 1, -20, -10},
-						   {100, -10, 11, 6, 6, 11, -10, 100}};
 
 int stabilityWeights2[8][8] = {{4, -3, 3, 2, 2, 3, -3, 4},
 							   {-3, -4, -1, -1, -1, -1, -4, -3},
@@ -142,8 +139,8 @@ int main(int argc, char *argv[])
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
 	initialise_board(); //one for each process
-	double time = 0.0;
-	clock_t begin = clock();
+	// double time = 0.0;
+	// clock_t begin = clock();
 	if (rank == 0)
 	{
 		run_master(argc, argv, fp);
@@ -153,9 +150,8 @@ int main(int argc, char *argv[])
 
 		run_worker(fp);
 	}
-
-	clock_t end = clock();
-	time += (double)(end - begin) / CLOCKS_PER_SEC;
+	// clock_t end = clock();
+	// time += (double)(end - begin) / CLOCKS_PER_SEC;
 	game_over();
 }
 
@@ -355,7 +351,7 @@ void gen_move_master(char *move, int my_colour, FILE *fp)
 
 	if (rank == 0)
 	{
-		MPI_Gather(send_arrMovesScore, 2, MPI_INT, buff, 2, MPI_INT, 0, MPI_COMM_WORLD); //gathers move and score
+		MPI_Gather(send_arrMovesScore, 2, MPI_INT, buff, 2, MPI_INT, 0, MPI_COMM_WORLD); //gathers (receive) move and score
 		loc = get_best_loc(buff);
 		// Debug("best loc %d", loc);														 //get best loc
 		free(buff);
@@ -373,9 +369,15 @@ void gen_move_master(char *move, int my_colour, FILE *fp)
 	}
 	else
 	{
-		MPI_Gather(send_arrMovesScore, 2, MPI_INT, NULL, 0, MPI_INT, 0, MPI_COMM_WORLD); //gathers move and score
+		MPI_Gather(send_arrMovesScore, 2, MPI_INT, NULL, 0, MPI_INT, 0, MPI_COMM_WORLD); //Gathers(sends) move and score
 	}
 }
+/**
+ * @brief Get the best loc object given in as array of 2
+ * 
+ * @param buff array of length 2
+ * @return int returns best location of move
+ */
 
 int get_best_loc(int *buff)
 {
@@ -391,7 +393,6 @@ int get_best_loc(int *buff)
 	}
 	return best_loc;
 }
-
 void apply_opp_move(char *move, int my_colour, FILE *fp)
 {
 	int loc;
@@ -521,7 +522,7 @@ int random_strategy(int my_colour, FILE *fp)
 	return (r);
 }
 
-int location_strategy(int my_colour, FILE *fp)
+int location_strategy(int my_colour, FILE *fp) //initial strategy
 {
 	int r;
 	int *moves = (int *)malloc(LEGALMOVSBUFSIZE * sizeof(int));
@@ -550,7 +551,7 @@ int location_strategy(int my_colour, FILE *fp)
 	free(moves);
 	return (r);
 }
-int find_highestPos(int *moves)
+int find_highestPos(int *moves) //only for location strategy
 {
 	int x, y;
 	int max = -21;
@@ -568,7 +569,11 @@ int find_highestPos(int *moves)
 	}
 	return max_i;
 }
-
+/**
+ * @brief sorts moves based off stability to speed up pruning
+ * 
+ * @param moves given moves array
+ */
 void sortMoves(int *moves) //based on stability
 {
 	int *movesValues = (int *)malloc(LEGALMOVSBUFSIZE * sizeof(int));
@@ -599,6 +604,13 @@ void sortMoves(int *moves) //based on stability
 	}
 	free(movesValues);
 }
+/**
+ * @brief moves for each rank that assigned and returned as pointer rank_moves
+ * 
+ * @param my_colour colour
+ * @param rank_moves pointer to each ranks moves
+ * @param fp file
+ */
 void rank_legal_moves(int my_colour, int *rank_moves, FILE *fp)
 {
 	int *moves = (int *)malloc(LEGALMOVSBUFSIZE * sizeof(int));
@@ -628,6 +640,13 @@ void rank_legal_moves(int my_colour, int *rank_moves, FILE *fp)
 	// Debug("rank move %d for rank %d", rank_moves[0], rank);
 	free(moves);
 }
+/**
+ * @brief decides best strategy move for player based on the best minimax score
+ * 
+ * @param my_colour players colour
+ * @param fp file
+ * @return int best move
+ */
 
 int minimax_strategy(int my_colour, FILE *fp)
 {
@@ -672,6 +691,17 @@ int minimax_strategy(int my_colour, FILE *fp)
 		return best_move;
 	}
 }
+/**
+ * @brief recursively called by minimax strategy, determining future moves for both max and min players 
+ * 
+ * @param depth starting depth until max depth
+ * @param bMaxMin max(you) or min(opp) player m
+ * @param my_colour players colour
+ * @param fp file
+ * @param alpha value for pruning
+ * @param beta value for pruning
+ * @return int score for that move max depth later
+ */
 int minimax_score(int depth, int bMaxMin, int my_colour, FILE *fp, int alpha, int beta)
 {
 	int i;
@@ -767,26 +797,26 @@ int min(int num1, int num2)
 	return (num1 > num2) ? num2 : num1;
 }
 
+/**
+ * @brief the evaluation function deciding what makes one move better than another
+ * 
+ * @param my_colour players colour
+ * @param fp file
+ * @return int determines best evaluation based on different heuristics and time of the game
+ */
 int evaluatePosition(int my_colour, FILE *fp)
 {
 	//int mobilityScore = evaluateMobility(my_colour, fp);
 	//int discDifference = evaluateDiscDifference(my_colour, fp);
 	//int stabilityScore = evaluateStability(my_colour, fp);
 	//int cornerEdgeScore = evaluateCorners(my_colour, fp);
-	int gameTime = evaluateGameTime(my_colour, fp);
+	//int gameTime = evaluateGameTime(my_colour, fp);
+	//return all_in_one(my_colour, 50*gameTime, 100*gameTime, 400-(100*gameTime), 150, 100-(10*gameTime), 100-(20*gameTime));
+	//return all_in_one(my_colour, 10*gameTime, 300*gameTime, 400-(100*gameTime), 150-(30*gameTime), 100-(10*gameTime), 100-(30*gameTime));//dynamic
 
-	switch (gameTime) //batman
-	{
-	case 0: //1/3
-		return evaluateMobility(my_colour, fp) + evaluateCorners(my_colour, NULL) + 100*evaluateCorner(my_colour,NULL);
-		break;
-	case 1: //2/3
-		return 100*evaluateCorner(my_colour, NULL)+evaluateMobility(my_colour, fp);
-		break;
-	case 2: //3/3
-		return all_in_one(my_colour)+ evaluateDiscDifference(my_colour, NULL);
-		break;
-	}
+	
+	//return all_in_one(my_colour, 10, 800, 400, 80, 80, 10);
+	
 
 	// switch (gameTime) //batman
 	// {
@@ -797,8 +827,10 @@ int evaluatePosition(int my_colour, FILE *fp)
 	// 	return 100*evaluateCorner(my_colour, NULL)+evaluateMobility(my_colour, fp);
 	// 	break;
 	// case 2: //3/3
-	// 	return all_in_one(my_colour)+ evaluateDiscDifference(my_colour, NULL);
+	// 	return all_in_one(my_colour, 10, 800, 400, 80, 80, 10);
 	// 	break;
+	// default:
+	// 	return all_in_one(my_colour, 10, 800, 400, 80, 80, 10);
 	// }
 
 	// switch (gameTime) //beats thanos not ironman balckpanther
@@ -826,7 +858,6 @@ int evaluatePosition(int my_colour, FILE *fp)
 	// 	break;
 	// }
 	//return evaluateCorner(my_colour, NULL);//spider man
-	return all_in_one(my_colour);
 
 	//return mobilityScore + cornerEdgeScore;
 	// if (gameTime == 0)
@@ -841,12 +872,18 @@ int evaluatePosition(int my_colour, FILE *fp)
 	// {
 	// 	return (stabilityScore * 0.56) + (mobilityScore * 3) + (discDifference * 0.92 * 5) + (cornerEdgeScore * 1.2);
 	// }
-	//return 2 * mobilityScore + discDifference;
+	//   return evaluateDiscDifference(my_colour,fp);
 	//  return (stabilityScore * 0.56) + (mobilityScore * 3) + (discDifference * 0.92 * 2) + (cornerEdgeScore * 1.2); //best
 	//return  (stabilityScore * 25*(3-gameTime)) + (mobilityScore *5* (3-gameTime)) + (discDifference *25*gameTime) + (cornerEdgeScore *35*gameTime);//thanos
 	//  return (stabilityScore * 0.3) + (mobilityScore * 0.3) + (discDifference * 0.05) + (cornerEdgeScore * 0.35);
 }
-
+/**
+ * @brief how many moves a player has and their opposition
+ * 
+ * @param my_colour player colour
+ * @param fp file
+ * @return int score based on their mobility
+ */
 int evaluateMobility(int my_colour, FILE *fp)
 {
 	int *playerMoves = (int *)malloc(LEGALMOVSBUFSIZE * sizeof(int));
@@ -861,7 +898,13 @@ int evaluateMobility(int my_colour, FILE *fp)
 	}
 	return 100 * (playerMoves[0] - opponentMoves[0]) / (playerMoves[0] + opponentMoves[0]);
 }
-
+/**
+ * @brief more of a static board than stability, but favours stable and semi stable positions
+ * 
+ * @param my_colour player colour
+ * @param fp file
+ * @return int returns the score of stability
+ */
 int evaluateStability(int my_colour, FILE *fp)
 {
 	int playerScore = 0, opponentScore = 0;
@@ -885,7 +928,13 @@ int evaluateStability(int my_colour, FILE *fp)
 	}
 	return 100 * (playerScore - opponentScore) / (playerScore + opponentScore);
 }
-
+/**
+ * @brief evaluates the best position being corners and edges, simlar to stability but more emphasis
+ * 
+ * @param my_colour colour
+ * @param fp file
+ * @return int 
+ */
 int evaluateCorners(int my_colour, FILE *fp)
 {
 	int playerScore = 0, opponentScore = 0;
@@ -909,11 +958,23 @@ int evaluateCorners(int my_colour, FILE *fp)
 	}
 	return 100 * (playerScore - opponentScore) / (playerScore + opponentScore);
 }
-int all_in_one(int my_colour)
+/**
+ * @brief combination of all heuristics based on proportions given
+ * 
+ * @param my_colour players colour
+ * @param d discs ratio
+ * @param c corner ratio
+ * @param s stabilty ratio
+ * @param m mobility ratio
+ * @param e edge ratio
+ * @param w weight ration
+ * @return int 
+ */
+int all_in_one(int my_colour, int d, int c, int s, int m, int e, int w)
 {
-	int my_color = my_colour, opp_color = opponent(my_colour, NULL);
-	int my_tiles = 0, opp_tiles = 0, j, k, my_front_tiles = 0, opp_front_tiles = 0, x, y;
-	double p = 0, c = 0, l = 0, m = 0, f = 0, d = 0;
+	int opp_colour = opponent(my_colour, NULL);
+	int my_discs = 0, opp_discs = 0, j, k, my_edge_discs = 0, opp_edge_discs = 0, x, y;
+	double discScore = 0, cornersScore = 0, stabilityCorners = 0, mobilityScore = 0, edges = 0, staticWeight = 0;
 
 	int X1[] = {-1, -1, 0, 1, 1, 1, 0, -1};
 	int Y1[] = {0, 1, 1, 1, 0, -1, -1, -1};
@@ -923,15 +984,15 @@ int all_in_one(int my_colour)
 	{
 		x = (i / 10) - 1;
 		y = (i % 10) - 1;
-		if (board[i] == my_color)
+		if (board[i] == my_colour)
 		{
-			d += stabilityWeights2[x][y];
-			my_tiles++;
+			staticWeight += stabilityWeights2[x][y];
+			my_discs++;
 		}
-		else if (board[i] == opp_color)
+		else if (board[i] == opp_colour)
 		{
-			d -= stabilityWeights2[x][y];
-			opp_tiles++;
+			staticWeight -= stabilityWeights2[x][y]; //weightings
+			opp_discs++;
 		}
 		if (board[i] != EMPTY)
 		{
@@ -941,113 +1002,113 @@ int all_in_one(int my_colour)
 				y = j + Y1[k];
 				if (x >= 0 && x < 8 && y >= 0 && y < 8 && board[i] == EMPTY)
 				{
-					if (board[i] == my_color)
-						my_front_tiles++;
+					if (board[i] == my_colour)
+						my_edge_discs++; //edges
 					else
-						opp_front_tiles++;
+						opp_edge_discs++;
 					break;
 				}
 			}
 		}
 	}
 
-	if (my_tiles > opp_tiles)
-		p = (100.0 * my_tiles) / (my_tiles + opp_tiles);
-	else if (my_tiles < opp_tiles)
-		p = -(100.0 * opp_tiles) / (my_tiles + opp_tiles);
+	if (my_discs > opp_discs)
+		discScore = (100.0 * my_discs) / (my_discs + opp_discs);
+	else if (my_discs < opp_discs)
+		discScore = -(100.0 * opp_discs) / (my_discs + opp_discs);
 	else
-		p = 0;
+		discScore = 0; //discs
 
-	if (my_front_tiles > opp_front_tiles)
-		f = -(100.0 * my_front_tiles) / (my_front_tiles + opp_front_tiles);
-	else if (my_front_tiles < opp_front_tiles)
-		f = (100.0 * opp_front_tiles) / (my_front_tiles + opp_front_tiles);
+	if (my_edge_discs > opp_edge_discs)
+		edges = -(100.0 * my_edge_discs) / (my_edge_discs + opp_edge_discs);
+	else if (my_edge_discs < opp_edge_discs)
+		edges = (100.0 * opp_edge_discs) / (my_edge_discs + opp_edge_discs);
 	else
-		f = 0;
+		edges = 0; //edges
 
 	// Corner occupancy
-	my_tiles = opp_tiles = 0;
-	if (board[11] == my_color)
-		my_tiles++;
-	else if (board[11] == opp_color)
-		opp_tiles++;
-	if (board[18] == my_color)
-		my_tiles++;
-	else if (board[18] == opp_color)
-		opp_tiles++;
-	if (board[81] == my_color)
-		my_tiles++;
-	else if (board[81] == opp_color)
-		opp_tiles++;
-	if (board[88] == my_color)
-		my_tiles++;
-	else if (board[88] == opp_color)
-		opp_tiles++;
-	c = 25 * (my_tiles - opp_tiles);
+	my_discs = opp_discs = 0;
+	if (board[11] == my_colour)
+		my_discs++;
+	else if (board[11] == opp_colour)
+		opp_discs++;
+	if (board[18] == my_colour)
+		my_discs++;
+	else if (board[18] == opp_colour)
+		opp_discs++;
+	if (board[81] == my_colour)
+		my_discs++;
+	else if (board[81] == opp_colour)
+		opp_discs++;
+	if (board[88] == my_colour)
+		my_discs++;
+	else if (board[88] == opp_colour)
+		opp_discs++;
+	cornersScore = 25 * (my_discs - opp_discs);
 
 	// Corner closeness
-	my_tiles = opp_tiles = 0;
+	my_discs = opp_discs = 0;
 	if (board[11] == EMPTY)
 	{
-		if (board[12] == my_color)
-			my_tiles++;
-		else if (board[12] == opp_color)
-			opp_tiles++;
-		if (board[22] == my_color)
-			my_tiles++;
-		else if (board[22] == opp_color)
-			opp_tiles++;
-		if (board[21] == my_color)
-			my_tiles++;
-		else if (board[21] == opp_color)
-			opp_tiles++;
+		if (board[12] == my_colour)
+			my_discs++;
+		else if (board[12] == opp_colour)
+			opp_discs++;
+		if (board[22] == my_colour)
+			my_discs++;
+		else if (board[22] == opp_colour)
+			opp_discs++;
+		if (board[21] == my_colour)
+			my_discs++;
+		else if (board[21] == opp_colour)
+			opp_discs++;
 	}
 	if (board[18] == EMPTY)
 	{
-		if (board[17] == my_color)
-			my_tiles++;
-		else if (board[17] == opp_color)
-			opp_tiles++;
-		if (board[27] == my_color)
-			my_tiles++;
-		else if (board[27] == opp_color)
-			opp_tiles++;
-		if (board[28] == my_color)
-			my_tiles++;
-		else if (board[28] == opp_color)
-			opp_tiles++;
+		if (board[17] == my_colour)
+			my_discs++;
+		else if (board[17] == opp_colour)
+			opp_discs++;
+		if (board[27] == my_colour)
+			my_discs++;
+		else if (board[27] == opp_colour)
+			opp_discs++;
+		if (board[28] == my_colour)
+			my_discs++;
+		else if (board[28] == opp_colour)
+			opp_discs++;
 	}
 	if (board[81] == EMPTY)
 	{
-		if (board[82] == my_color)
-			my_tiles++;
-		else if (board[82] == opp_color)
-			opp_tiles++;
-		if (board[72] == my_color)
-			my_tiles++;
-		else if (board[72] == opp_color)
-			opp_tiles++;
-		if (board[71] == my_color)
-			my_tiles++;
-		else if (board[71] == opp_color)
-			opp_tiles++;
+		if (board[82] == my_colour)
+			my_discs++;
+		else if (board[82] == opp_colour)
+			opp_discs++;
+		if (board[72] == my_colour)
+			my_discs++;
+		else if (board[72] == opp_colour)
+			opp_discs++;
+		if (board[71] == my_colour)
+			my_discs++;
+		else if (board[71] == opp_colour)
+			opp_discs++;
 	}
 	if (board[88] == EMPTY)
 	{
-		if (board[78] == my_color)
-			my_tiles++;
-		else if (board[78] == opp_color)
-			opp_tiles++;
-		if (board[77] == my_color)
-			my_tiles++;
-		else if (board[77] == opp_color)
-			opp_tiles++;
-		if (board[87] == my_color)
-			my_tiles++;
-		else if (board[87] == opp_color)
-			opp_tiles++;
+		if (board[78] == my_colour)
+			my_discs++;
+		else if (board[78] == opp_colour)
+			opp_discs++;
+		if (board[77] == my_colour)
+			my_discs++;
+		else if (board[77] == opp_colour)
+			opp_discs++;
+		if (board[87] == my_colour)
+			my_discs++;
+		else if (board[87] == opp_colour)
+			opp_discs++;
 	}
-	l = -12.5 * (my_tiles - opp_tiles);
+	stabilityCorners = -12.5 * (my_discs - opp_discs);
 
 	// Mobility
 
@@ -1055,22 +1116,28 @@ int all_in_one(int my_colour)
 	int *opponentMoves = (int *)malloc(LEGALMOVSBUFSIZE * sizeof(int));
 
 	legal_moves(my_colour, playerMoves, NULL);
-	legal_moves(opp_color, opponentMoves, NULL);
+	legal_moves(opp_colour, opponentMoves, NULL);
 
-	my_tiles = playerMoves[0];
-	opp_tiles = opponentMoves[0];
-	if (my_tiles > opp_tiles)
-		m = (100.0 * my_tiles) / (my_tiles + opp_tiles);
-	else if (my_tiles < opp_tiles)
-		m = -(100.0 * opp_tiles) / (my_tiles + opp_tiles);
+	my_discs = playerMoves[0];
+	opp_discs = opponentMoves[0];
+	if (my_discs > opp_discs)
+		mobilityScore = (100.0 * my_discs) / (my_discs + opp_discs);
+	else if (my_discs < opp_discs)
+		mobilityScore = -(100.0 * opp_discs) / (my_discs + opp_discs);
 	else
-		m = 0;
+		mobilityScore = 0;
 
 	// final weighted score
-	double score = (10 * p) + (801.724 * c) + (382.026 * l) + (78.922 * m) + (74.396 * f) + (10 * d);
-	return (int)score;
+	int score = (d * discScore) + (c * cornersScore) + (s * stabilityCorners) + (m * mobilityScore) + (e * edges) + (w * staticWeight);
+	return score;
 }
-
+/**
+ * @brief calculates preference to static board and espicially against opp corners
+ * 
+ * @param my_colour colour
+ * @param fp file
+ * @return int score
+ */
 int evaluateCorner(int my_colour, FILE *fp)
 {
 	int score = 0;
@@ -1113,8 +1180,15 @@ int evaluateCorner(int my_colour, FILE *fp)
 			}
 		}
 	}
-	return score;
+	return 100 * score;
 }
+/**
+ * @brief score of discs
+ * 
+ * @param my_colour 
+ * @param fp 
+ * @return int disc scores
+ */
 int evaluateDiscDifference(int my_colour, FILE *fp)
 {
 	int playerScore = 0, opponentScore = 0;
@@ -1132,7 +1206,13 @@ int evaluateDiscDifference(int my_colour, FILE *fp)
 
 	return 100 * (playerScore - opponentScore) / (playerScore + opponentScore);
 }
-
+/**
+ * @brief moment of the game in thirds
+ * 
+ * @param my_colour colour
+ * @param fp file
+ * @return int 0 1 or 2
+ */
 int evaluateGameTime(int my_colour, FILE *fp)
 {
 	int playerScore = 0, opponentScore = 0;
@@ -1162,6 +1242,12 @@ int evaluateGameTime(int my_colour, FILE *fp)
 	}
 }
 
+/**
+ * @brief board cpy
+ * 
+ * @param board original
+ * @param cBoard copy
+ */
 void duplicateBoard(int *board, int *cBoard)
 {
 	for (int i = 0; i < BOARDSIZE; i++)
