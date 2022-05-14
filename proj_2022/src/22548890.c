@@ -55,7 +55,7 @@ const int BLACK = 1;
 const int WHITE = 2;
 const int MAX = 1000000000;
 const int MIN = -1000000000;
-const int MAXDEPTH = 8;
+const int MAXDEPTH = 9;
 
 const int OUTER = 3;
 const int ALLDIRECTIONS[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
@@ -813,23 +813,42 @@ int evaluatePosition(int my_colour, FILE *fp)
 	//int gameTime = evaluateGameTime(my_colour, fp);
 	//return all_in_one(my_colour, 50*gameTime, 100*gameTime, 400-(100*gameTime), 150, 100-(10*gameTime), 100-(20*gameTime));
 	//return all_in_one(my_colour, 10*gameTime, 300*gameTime, 400-(100*gameTime), 150-(30*gameTime), 100-(10*gameTime), 100-(30*gameTime));//dynamic
-
+	int opp_colour=opponent(my_colour,fp);//cheap10
+	int my_discs=0, opp_discs = 0;
+	if (board[11] == my_colour)
+		my_discs++;
+	else if (board[11] == opp_colour)
+		opp_discs++;
+	if (board[18] == my_colour)
+		my_discs++;
+	else if (board[18] == opp_colour)
+		opp_discs++;
+	if (board[81] == my_colour)
+		my_discs++;
+	else if (board[81] == opp_colour)
+		opp_discs++;
+	if (board[88] == my_colour)
+		my_discs++;
+	else if (board[88] == opp_colour)
+		opp_discs++;
+	return (my_discs - opp_discs);
+	
 	//return all_in_one(my_colour, 10, 800, 400, 80, 80, 10);
 	
-	switch (evaluateGameTime(my_colour, fp)) //batman
-	{
-	case 0: //1/3
-		return evaluateMobility(my_colour, fp) + evaluateCorners(my_colour, NULL) + 100*evaluateCorner(my_colour,NULL);
-		break;
-	case 1: //2/3
-		return 100*evaluateCorner(my_colour, NULL)+evaluateMobility(my_colour, fp);
-		break;
-	case 2: //3/3
-		return all_in_one(my_colour, 10, 800, 400, 80, 80, 10);
-		break;
-	default:
-		return evaluateCorner(my_colour, NULL);
-	}
+	// switch (evaluateGameTime(my_colour, fp)) //batman
+	// {
+	// case 0: //1/3
+	// 	return evaluateMobility(my_colour, fp) + evaluateCorners(my_colour, NULL) + 100*evaluateCorner(my_colour,NULL);
+	// 	break;
+	// case 1: //2/3
+	// 	return 100*evaluateCorner(my_colour, NULL)+evaluateMobility(my_colour, fp);
+	// 	break;
+	// case 2: //3/3
+	// 	return all_in_one(my_colour, 10, 800, 400, 80, 80, 10);
+	// 	break;
+	// default:
+	// 	return evaluateCorner(my_colour, NULL);
+	// }
 
 	// switch (gameTime) //beats thanos not ironman balckpanther
 	// {
