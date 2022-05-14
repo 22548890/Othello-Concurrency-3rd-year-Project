@@ -27,14 +27,7 @@
  *    IMPORTANT NOTE:
  *        Write any (debugging) output you would like to see to a file. 
  *        	- This can be done using file fp, and fprintf()
- *        	- Don't forget to flush the stream
- *        	- Write a method to make this easier
- *        In a multiprocessor version 
- *        	- each process should write debug info to its own file 
- *H***********************************************************************/
-/**Sources I made use of:
- * http://ceur-ws.org/Vol-1107/paper2.pdf
- * https://courses.cs.washington.edu/courses/cse573/04au/Project/mini1/RUSSIA/Final_Paper.pdf
+ *        	- Don't forget to flush the streamint alpha_sharing_top(int alpha)
  * https://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-4-alpha-beta-pruning/?ref=lbp
  * https://www.javatpoint.com/mini-max-algorithm-in-ai
  */
@@ -55,7 +48,7 @@ const int BLACK = 1;
 const int WHITE = 2;
 const int MAX = 1000000000;
 const int MIN = -1000000000;
-const int MAXDEPTH = 9;
+const int MAXDEPTH = 8;
 
 const int OUTER = 3;
 const int ALLDIRECTIONS[8] = {-11, -10, -9, -1, 1, 9, 10, 11};
@@ -105,6 +98,7 @@ int evaluateCorner(int my_colour, FILE *fp);
 int all_in_one(int my_colour, int d, int c, int s, int m, int e, int w);
 void sortMoves(int *moves);
 int get_best_loc(int *buff);
+int alpha_sharing_top(int alpha, int my_rank);
 
 int send_arrMovesScore[2];
 int size;
@@ -130,6 +124,7 @@ int cornersWeights[8][8] = {{10, 1, 5, 3, 3, 5, 1, 10},
 
 int *board;
 int best_val;
+int alpha_sharing;
 
 int main(int argc, char *argv[])
 {
@@ -743,6 +738,7 @@ int minimax_score(int depth, int bMaxMin, int my_colour, FILE *fp, int alpha, in
 			best = max(best, score);
 			alpha = max(alpha, best);
 
+			alpha_sharing_top(alpha, 0);
 			if (beta <= alpha)
 			{
 				break; //prune
@@ -813,42 +809,105 @@ int evaluatePosition(int my_colour, FILE *fp)
 	//int gameTime = evaluateGameTime(my_colour, fp);
 	//return all_in_one(my_colour, 50*gameTime, 100*gameTime, 400-(100*gameTime), 150, 100-(10*gameTime), 100-(20*gameTime));
 	//return all_in_one(my_colour, 10*gameTime, 300*gameTime, 400-(100*gameTime), 150-(30*gameTime), 100-(10*gameTime), 100-(30*gameTime));//dynamic
-	int opp_colour=opponent(my_colour,fp);//cheap10
-	int my_discs=0, opp_discs = 0;
-	if (board[11] == my_colour)
-		my_discs++;
-	else if (board[11] == opp_colour)
-		opp_discs++;
-	if (board[18] == my_colour)
-		my_discs++;
-	else if (board[18] == opp_colour)
-		opp_discs++;
-	if (board[81] == my_colour)
-		my_discs++;
-	else if (board[81] == opp_colour)
-		opp_discs++;
-	if (board[88] == my_colour)
-		my_discs++;
-	else if (board[88] == opp_colour)
-		opp_discs++;
-	return (my_discs - opp_discs);
-	
-	//return all_in_one(my_colour, 10, 800, 400, 80, 80, 10);
-	
-	// switch (evaluateGameTime(my_colour, fp)) //batman
+	// int opp_colour = opponent(my_colour, fp); //cheap9
+	// int my_discs = 0, opp_discs = 0;
+	// if (board[11] == my_colour)
+	// 	my_discs++;
+	// else if (board[11] == opp_colour)
+	// 	opp_discs++;
+	// if (board[18] == my_colour)
+	// 	my_discs++;
+	// else if (board[18] == opp_colour)
+	// 	opp_discs++;
+	// if (board[81] == my_colour)
+	// 	my_discs++;
+	// else if (board[81] == opp_colour)
+	// 	opp_discs++;
+	// if (board[88] == my_colour)
+	// 	my_discs++;
+	// else if (board[88] == opp_colour)
+	// 	opp_discs++;
+
+	// int score = my_discs-(2*opp_discs);
+	// if (board[11] == EMPTY)
 	// {
-	// case 0: //1/3
-	// 	return evaluateMobility(my_colour, fp) + evaluateCorners(my_colour, NULL) + 100*evaluateCorner(my_colour,NULL);
-	// 	break;
-	// case 1: //2/3
-	// 	return 100*evaluateCorner(my_colour, NULL)+evaluateMobility(my_colour, fp);
-	// 	break;
-	// case 2: //3/3
-	// 	return all_in_one(my_colour, 10, 800, 400, 80, 80, 10);
-	// 	break;
-	// default:
-	// 	return evaluateCorner(my_colour, NULL);
+	// 	if (board[12] == my_colour)
+	// 		my_discs++;
+	// 	else if (board[12] == opp_colour)
+	// 		opp_discs++;
+	// 	if (board[22] == my_colour)
+	// 		my_discs++;
+	// 	else if (board[22] == opp_colour)
+	// 		opp_discs++;
+	// 	if (board[21] == my_colour)
+	// 		my_discs++;
+	// 	else if (board[21] == opp_colour)
+	// 		opp_discs++;
 	// }
+	// if (board[18] == EMPTY)
+	// {
+	// 	if (board[17] == my_colour)
+	// 		my_discs++;
+	// 	else if (board[17] == opp_colour)
+	// 		opp_discs++;
+	// 	if (board[27] == my_colour)
+	// 		my_discs++;
+	// 	else if (board[27] == opp_colour)
+	// 		opp_discs++;
+	// 	if (board[28] == my_colour)
+	// 		my_discs++;
+	// 	else if (board[28] == opp_colour)
+	// 		opp_discs++;
+	// }
+	// if (board[81] == EMPTY)
+	// {
+	// 	if (board[82] == my_colour)
+	// 		my_discs++;
+	// 	else if (board[82] == opp_colour)
+	// 		opp_discs++;
+	// 	if (board[72] == my_colour)
+	// 		my_discs++;
+	// 	else if (board[72] == opp_colour)
+	// 		opp_discs++;
+	// 	if (board[71] == my_colour)
+	// 		my_discs++;
+	// 	else if (board[71] == opp_colour)
+	// 		opp_discs++;
+	// }
+	// if (board[88] == EMPTY)
+	// {
+	// 	if (board[78] == my_colour)
+	// 		my_discs++;
+	// 	else if (board[78] == opp_colour)
+	// 		opp_discs++;
+	// 	if (board[77] == my_colour)
+	// 		my_discs++;
+	// 	else if (board[77] == opp_colour)
+	// 		opp_discs++;
+	// 	if (board[87] == my_colour)
+	// 		my_discs++;
+	// 	else if (board[87] == opp_colour)
+	// 		opp_discs++;
+	// }
+	// score +=-my_discs+opp_discs;
+	// return score;
+
+	//return all_in_one(my_colour, 10, 800, 400, 80, 80, 10);
+
+	switch (evaluateGameTime(my_colour, fp)) //batman
+	{
+	case 0: //1/3
+		return evaluateMobility(my_colour, fp) + evaluateCorners(my_colour, NULL) + evaluateCorner(my_colour, NULL);
+		break;
+	case 1: //2/3
+		return evaluateCorner(my_colour, NULL);
+		break;
+	case 2: //3/3
+		return all_in_one(my_colour, 10, 800, 400, 80, 80, 10);
+		break;
+	default:
+		return evaluateCorner(my_colour, NULL);
+	}
 
 	// switch (gameTime) //beats thanos not ironman balckpanther
 	// {
@@ -874,7 +933,7 @@ int evaluatePosition(int my_colour, FILE *fp)
 	// 	return all_in_one(my_colour);
 	// 	break;
 	// }
-	//return evaluateCorner(my_colour, NULL);//spider man
+	// return evaluateCorner(my_colour, NULL);//spider man
 
 	//return mobilityScore + cornerEdgeScore;
 	// if (gameTime == 0)
@@ -1257,6 +1316,39 @@ int evaluateGameTime(int my_colour, FILE *fp)
 	{
 		return 2; //final stages
 	}
+}
+/**
+ * @brief shares the alpha value between the different ranks, to increase pruning
+ * 
+ * @param alpha given current alpha value
+ * @param my_rank current rank
+ * @return int return the alpha vlaue or shared alpha depending if its larger
+ */
+int alpha_sharing_top(int alpha, int my_rank)
+{
+	MPI_Request request;
+	int alpha_recv = 0;
+
+	if (my_rank != 0)
+	{
+		for (int p = 0; p <= size; p++)
+		{
+			if (p != my_rank)
+			{
+				MPI_Isend(&alpha, 1, MPI_INT, p, 5, MPI_COMM_WORLD, &request);
+				//fprintf(fp,"p is %d and rank is %d\n", p, rank); //send to all but itself
+			}
+		}
+		MPI_Iprobe(MPI_ANY_SOURCE, 5, MPI_COMM_WORLD, &alpha_recv, MPI_STATUS_IGNORE); //check if received alpha
+
+		if (alpha_recv != 0)
+		{ //if alpha was sent
+			MPI_Recv(&alpha_sharing, 1, MPI_INT, MPI_ANY_SOURCE, 5, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+			alpha_recv = 0; //change alpha sharing variable for all ranks
+		}
+		alpha = max(alpha_sharing, alpha); //find max for pruning
+	}
+	return alpha;
 }
 
 /**
