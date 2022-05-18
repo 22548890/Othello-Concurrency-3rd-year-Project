@@ -2,46 +2,56 @@
 #include <stdio.h>
 #include <omp.h>
 
-const int RMAX = 100000;
-int thread_count;
+#define TRUE (1==1)
+#define FALSE (1==0)
 
-/* Headers for helper functions */
+const int RMAX = 100000;
+int thread_count; 
 void print_list(int a[], int n, char* title);
 void generate_list(int a[], int n);
 void usage();
-void serial_quicksort(int numbers[], int left, int right);
-int check_list(int* array, int size);
+void serial_quicksort(int list_of_numbers[], int left, int right);
+int is_sorted(int* array, int size);
 
-/* Merge sorted arrays A and B */
-void merge(int* A, int size_a, int* B, int size_b)
+/* Merge sorted arrays array_a and array_b */
+void merge(int* array_a, int size_a, int* array_b, int size_b)
 {
-	int i = 0, j = 0, k = 0;
-	int size_tmp = size_a + size_b;
-	int* tmp = malloc(sizeof(int)*size_tmp);
+	int i = 0, j = 0; 
+	int combined_size = size_a + size_b;
+	int* merged_array = malloc(sizeof(int)*combined_size);
 
-	/* merge A and B into tmp in sorted order */
-	while (k < size_tmp) {
-		/* inside A and B, copy smaller value */
-		if (i < size_a && j < size_b) {
-			tmp[k++] = (A[i] <= B[j]) ? A[i++] : B[j++];
+	for (int k = 0; k < combined_size; k++)
+	{
+		/* array_a[i] <= array_b[j] and not all items of array_a have been copied: copy next item from array_a  */
+		if (array_a[i] <= array_b[j] && i < size_a)
+		{
+			merged_array[k] = array_a[i];
+			i++;
 		}
-		/* past end of A => copy rest of B */
-		else if (i >= size_a) {
-			while (k < size_tmp) {
-				tmp[k++] = B[j++];
-			}
+		/* array_a[i] >= array_b[j] and not all items of array_b have been copied: copy next item from array_b */
+		else if (array_a[i] > array_b[j] && j < size_b)
+		{
+			merged_array[k] = array_b[j];
+			j++;
 		}
-		/* past end of B => copy rest of A */
-		else if (j >= size_b) {
-			while (k < size_tmp) {
-				tmp[k++] = A[i++];
-			}
+		/* all items of array_a have been copied => copy the rest of array_b */
+		else if (i >= size_a)
+		{
+			merged_array[k] = array_b[j];
+			j++;
+		}
+		/* all items of array_b have been copied => copy the rest of array_a */
+		else if (j >= size_b)
+		{
+			merged_array[k] = array_a[i];
+			i++;
 		}
 	}
-	
-	for (i = 0; i < size_tmp; i++)
-		A[i] = tmp[i];
-	free(tmp);
+
+	/* copy the merged array into array_a */	
+	for (int k = 0; k < combined_size; k++)
+		array_a[k] = merged_array[k];
+	free(merged_array);
 }
 
 void merge_arrays(int* array, int size, int* indices)
@@ -53,7 +63,7 @@ void merge_arrays(int* array, int size, int* indices)
 		for (i = 0; i < N; i++)
 			indices[i] = (i*size)/N;
 		indices[N] = size;
-		#pragma omp parallel for
+#		pragma omp parallel for
 		for (i = 0; i < N; i+=2)
 			merge(array+indices[i],indices[i+1]-indices[i],array+indices[i+1],indices[i+2]-indices[i+1]);
 			
@@ -61,100 +71,104 @@ void merge_arrays(int* array, int size, int* indices)
 	}
 }
 
-void serialQuickSort(int numbers[], int array_size)
+void serialQuickSort(int list_of_numbers[], int array_size)
 {
-	serial_quicksort(numbers, 0, array_size - 1);
+  serial_quicksort(list_of_numbers, 0, array_size - 1);
 }
 
 int main(int argc, char **argv)
 {
 	int n;
 	int i;
-	double start, finish;
-	
-	if (argc != 3)
-		usage();
+	double start_time, end_time;
 	
 	/* read parameters from command line */
+	if (argc != 3) usage();
 	thread_count = strtol(argv[1], NULL, 10);
 	n = strtol(argv[2], NULL, 10);
+	omp_set_num_threads(thread_count);
 	
 	printf ("Sorting an array of %d random elements using %d threads.\n", n, thread_count);
 	
-	omp_set_num_threads(thread_count);
-	
-	/* the initial unsorted array */
+	/* Generate the unsorted array */
 	int *array = malloc(sizeof(int)*n);
-	
-	/* indices demarcating the starts of each thread's data */
-	int *indices = malloc(sizeof(int)*(thread_count+1));
-	
 	generate_list(array, n);
-	#ifdef DEBUG
+#	ifdef DEBUG
 	print_list(array, n, "Unsorted");
-	#endif
+#	endif	
 	
-	/* divide the array in chunks among the threads */
-	for (i = 0; i < thread_count; i++) indices[i] = (i*n)/thread_count;
+	/* Divide the array in chunks among the threads and store the start_timeing indices */
+	int *indices = malloc(sizeof(int)*(thread_count+1));
+	for (i = 0; i < thread_count; i++)
+		indices[i] = (i*n)/thread_count;
 	indices[thread_count] = n;
 	
-	start = omp_get_wtime();
-	#pragma omp parallel for
-	for (i = 0; i < thread_count; i++) {
+
+	/* The threads sort (using a serial quicksort) their chunks in parallel 
+	 * and then the chunks are merged */ 
+	start_time = omp_get_wtime();
+#	pragma omp parallel for
+	for (i = 0; i < thread_count; i++)
 		serialQuickSort(array+indices[i], indices[i+1]-indices[i]);
-	}	
+	
 	merge_arrays(array, n, indices);
+	end_time = omp_get_wtime();
 	
-	finish = omp_get_wtime();
-	
-	#ifdef DEBUG
+#	ifdef DEBUG
 	print_list(array, n, "Sorted");
-	printf("Validating... ");
-	if (check_list(array, n)) printf("Array is sorted.\n");
-	else printf("Array is not sorted.\n");
-	#endif
-	printf("*************************************************************\n");
-	printf("Sorting %d elements using quicksort on %d threads took %f s\n", n, thread_count, (finish-start));
+#	endif	
+	printf ("The array is sorted: %s\n", is_sorted(array, n)?"TRUE":"FALSE");
+	printf ("***************************************************************************\n");
+	printf ("* Took %f s to quicksort an array of %d elements using %d threads. *\n", (end_time-start_time), n, thread_count);
+	printf ("***************************************************************************\n");
 	
 	FILE *fp;
 	fp = fopen("results.dat", "a");
 	if (fp == NULL) {
-		printf("results.dat could not be opened for writing.\n");
+		printf("I couldn't open results.dat for writing.\n");
 		exit(0);
-	} else {
-		fprintf (fp, "%d %d %f\n", thread_count, n, (finish-start));
+	}
+	else {
+		fprintf (fp, "%d %d %f\n", thread_count, n, (end_time - start_time));
 	}
 
 	return 0;
 }
 
 /* standard implementation of a quicksort done serially */
-void serial_quicksort(int numbers[], int left, int right)
+void serial_quicksort(int list_of_numbers[], int left, int right)
 {
-	int pivot, l_hold, r_hold;
+  int pivot, tmp_left, tmp_right;
  
-	l_hold = left;
-	r_hold = right;
-	pivot = numbers[left];
-	while (left < right) {
-		while ((numbers[right] >= pivot) && (left < right)) right--;
-		if (left != right) {
-			numbers[left] = numbers[right];
-			left++;
-		}
-		while ((numbers[left] <= pivot) && (left < right)) left++;
-		if (left != right) {
-			numbers[right] = numbers[left];
-			right--;
-		}
-	}
-	numbers[left] = pivot;
-	pivot = left;
-	left = l_hold;
-	right = r_hold;
+  tmp_left = left;
+  tmp_right = right;
+  pivot = list_of_numbers[left];
+  while (left < right)
+  {
+    while ((list_of_numbers[right] >= pivot) && (left < right))
+      right--;
+    if (left != right)
+    {
+      list_of_numbers[left] = list_of_numbers[right];
+      left++;
+    }
+    while ((list_of_numbers[left] <= pivot) && (left < right))
+      left++;
+    if (left != right)
+    {
+      list_of_numbers[right] = list_of_numbers[left];
+      right--;
+    }
+  }
+  list_of_numbers[left] = pivot;
+  pivot = left;
+  left = tmp_left;
+  right = tmp_right;
 
-	if (left < pivot) serial_quicksort(numbers, left, pivot-1);
-	if (right > pivot) serial_quicksort(numbers, pivot+1, right);
+  if (left < pivot)
+	serial_quicksort(list_of_numbers, left, pivot-1);
+  if (right > pivot)
+	serial_quicksort(list_of_numbers, pivot+1, right);
 
 }
 
@@ -175,15 +189,15 @@ void generate_list(int a[], int n) {
       a[i] = random() % RMAX;
 }  /* generate_list */
 
-int check_list(int* array, int size)
+int is_sorted(int* array, int size)
 {
 	int i = 0;
 	for (i = 1; i < size; i++)
 	{
 		if (array[i] < array[i-1])
-			return 0;
+			return FALSE;
 	}
-	return 1;
+	return TRUE;
 }
 
 void usage()
